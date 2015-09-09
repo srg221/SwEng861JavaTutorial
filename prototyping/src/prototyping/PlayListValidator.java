@@ -13,7 +13,7 @@ public class PlayListValidator {
 		boolean ret = false;
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.scanner.next();
-            if ( line.startsWith(Tokens.EXT_X_STREAM_INF_TAG)){
+            if ( line.startsWith(Tokens.EXT_X_STREAM_INF)){
             	ret = true;
             	break;
             }
