@@ -2,6 +2,6 @@ package prototyping;
 
 public class extTag {
 
-	M3u8InputStream inStream;
-	PlayList containingList;
+	protected M3u8InputStream inStream;
+	protected PlayList containingList;
 }

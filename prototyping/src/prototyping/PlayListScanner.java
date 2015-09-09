@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class PlayListScanner {
 
-	private Scanner scanner;
+	public Scanner scanner;
 	
 	PlayListScanner( InputStream inStream) 
 	{
