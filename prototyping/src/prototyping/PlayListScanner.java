@@ -7,7 +7,7 @@ public class PlayListScanner {
 
 	public Scanner scanner;
 	
-	PlayListScanner( InputStream inStream) 
+	PlayListScanner( InputStream inStream ) 
 	{
 		scanner = new Scanner(inStream).useDelimiter("\\r?\\n");  //return followed by newline
 	}

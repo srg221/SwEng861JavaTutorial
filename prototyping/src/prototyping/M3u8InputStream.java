@@ -9,8 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+//import java.util.logging.Handler;
+//import java.util.logging.Logger;
 
 public class M3u8InputStream {
 
@@ -94,4 +94,10 @@ public class M3u8InputStream {
 		return mInputStream;
 	}
 	
+	public String GetUrlNoFN(){
+		//String fName = mUrl.getFile();
+		String sUrl = mUrl.toString();
+		//return sUrl.substring(0, sUrl.indexOf(fName));
+		return ((String)sUrl.subSequence(0, sUrl.lastIndexOf('/')));
+	}
 }

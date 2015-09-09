@@ -2,15 +2,16 @@ package prototyping;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collections;
+import java.util.ArrayList;
+//import java.util.Collections;
 import java.util.List;
 
 public class PlayList 
 {
 	protected boolean isMaster;
 	protected    M3u8InputStream inStream;
-	protected List<extTag> validTags;
-	protected List<String> invalidTags;
+	public ArrayList<extTag> validTags = new ArrayList<extTag>();
+	protected ArrayList<String> invalidTags = new ArrayList<String>();
 	
 	public PlayList(){};
 	public PlayList(String url) {
@@ -34,5 +35,7 @@ public class PlayList
 		
 		mediaStream.rootPlaylist.Validate(mediaStream);
 	}
+	
+	public boolean IsMaster(){ return isMaster; }
 }
 
