@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Base64;
 //import java.util.logging.Handler;
 //import java.util.logging.Logger;
 
@@ -17,9 +18,6 @@ public class M3u8InputStream {
 	private URL mUrl = null;
 	private InputStream mInputStream = null;
 	private File mLocalFile = null;
-	// TODO setup logger and path in constructor
-	//private Logger mErrorLogger = null;
-	//private Handler mErrorLogHandler = null;
 	private String mLocalRootPath = "";
 	
 	void CreatePathAndLog(String localRootPath) {
@@ -30,9 +28,6 @@ public class M3u8InputStream {
 	{
 		mUrl = new URL(url);
 		mLocalRootPath = localRootPath;
-		//mErrorLogger = new Logger(localRootPath);
-		// mErrorLogHandler = new FileHandler("test.log", LOG_SIZE, LOG_ROTATION_COUNT);
-		// Logger.getLogger("").addHandler(handler);
 	}
 	
 	public M3u8InputStream(String url) throws MalformedURLException 
@@ -43,14 +38,33 @@ public class M3u8InputStream {
 	
 	public void Download() 
 	{
-		try 
-		{
-			// if need to set connection attribites
-			//java.net.URLConnection conn = mUrl.openConnection();
+			// if need to set connection attribites, say pswd
+			java.net.URLConnection conn;
+			try {
+				conn = mUrl.openConnection();
+
+			// hardcoded (for class only, if not in url)
+			// String username = "tomcat";
+			// String pswd = "Apac-Hee";
+			// String userpass = username + ":" + pswd;
+			// check if in url
+			if (mUrl.getUserInfo() != null) {
+			    // need to import org.apache.commons.codec.binary.Base64 to use
+				// String basicAuth = "Basic " + new String(new Base64().encode(url.getUserInfo().getBytes()));
+				String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(mUrl.getUserInfo().getBytes());
+				conn.setRequestProperty("Authorization", basicAuth);
+			}
+			// this gives a Base64 constructor error
+			//String basicAuth = "Basic " + new String(Base64.encodeBase64(userpass.getBytes()));
+			// alternate Base64 encode
+			//String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+			//conn.setRequestProperty ("Authorization", basicAuth);
 	        //conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613  Firefox/6.0a2");
-	        //InputStream connInStream = conn.getInputStream();
-	        //ReadableByteChannel rbc1 = Channels.newChannel(connInStream);
-			ReadableByteChannel rbc = Channels.newChannel(mUrl.openStream());
+	        InputStream connInStream = conn.getInputStream();
+	        ReadableByteChannel rbc = Channels.newChannel(connInStream);
+			
+			// else just this if don't need to set/add request properties
+			//ReadableByteChannel rbc = Channels.newChannel(mUrl.openStream());
 			
 			// set up local storage and create file
 			String localPath = mLocalRootPath + mUrl.getPath();
@@ -66,14 +80,13 @@ public class M3u8InputStream {
 			// stream out 
 			FileOutputStream fos = new FileOutputStream(mLocalFile);
 			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-			fos.close();		
-		} 
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			fos.close();	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 	}
+	
 	
 	public File GetFile() 
 	{
