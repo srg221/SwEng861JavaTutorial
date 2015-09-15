@@ -4,8 +4,10 @@ import java.io.IOException;
 
 public class PlayListValidator {
 	private PlayListScanner listScanner;
+	private PlayList mPlayList;
 	
 	PlayListValidator(PlayList playList) throws IOException{
+		mPlayList = playList;
 		listScanner = new PlayListScanner(playList.inStream.GetInputStream());
 	}
 	
@@ -20,5 +22,8 @@ public class PlayListValidator {
 		}
             return ret;
     }
-
+	
+	public void Log(String[] fields){
+		mPlayList.mediaStream.mErrorLogger.Log(fields);
+	}
 }

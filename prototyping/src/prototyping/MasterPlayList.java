@@ -5,13 +5,14 @@ import java.io.IOException;
 
 public class MasterPlayList extends PlayList {
 	
-	public MasterPlayList(String url) {
-		super(url);
+	public MasterPlayList(String url, MediaStream mediaStream) {
+		super(url, mediaStream);
 		isMaster = true;
 	}
 	
-	public MasterPlayList(M3u8InputStream m3u8In){
+	public MasterPlayList(M3u8InputStream m3u8In, MediaStream inMediaStream){
 		super();
+		mediaStream = inMediaStream;
 		inStream = m3u8In;
 		isMaster = true;
 	}

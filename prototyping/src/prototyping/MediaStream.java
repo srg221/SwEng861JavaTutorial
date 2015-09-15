@@ -11,13 +11,13 @@ public class MediaStream {
 	public ArrayList<MediaPlayList> mediaPlayLists = new ArrayList<MediaPlayList>();
 	// TODO setup logger and path in constructor
 	public SimpleLogger mErrorLogger = null;
-	public Handler mErrorLogHandler = null;
+	//public Handler mErrorLogHandler = null;
 	
 	MediaStream(String rootUrl) {
 		mErrorLogger = new SimpleLogger();
 		//mErrorLogHandler = new FileHandler("test.log", LOG_SIZE, LOG_ROTATION_COUNT);
 		//Logger.getLogger("").addHandler(handler);
-		rootPlaylist = new PlayList(rootUrl);
+		rootPlaylist = new PlayList(rootUrl, this);
 	}
 	
 	public void Validate() throws IOException {
@@ -27,7 +27,7 @@ public class MediaStream {
 		if (rootPlaylist.IsMaster()){
 			for (extTag tag : rootPlaylist.validTags){
 				// build media playlists
-				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream);
+				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream, this);
 				mediaPlayLists.add(mediaPlayList);
 			}
 			for (MediaPlayList mediaPlayList : mediaPlayLists){

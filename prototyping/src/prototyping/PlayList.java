@@ -10,13 +10,15 @@ public class PlayList
 {
 	protected boolean isMaster;
 	protected    M3u8InputStream inStream;
+	public MediaStream mediaStream;
 	public ArrayList<extTag> validTags = new ArrayList<extTag>();
 	protected ArrayList<String> invalidTags = new ArrayList<String>();
 	
 	public PlayList(){};
-	public PlayList(String url) {
+	public PlayList(String url, MediaStream inMediaStream) {
 		try {
-			inStream = new M3u8InputStream(url);
+			inStream = new M3u8InputStream(url, this);
+			mediaStream = inMediaStream;
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -27,10 +29,10 @@ public class PlayList
 	public void Validate(MediaStream mediaStream) throws IOException{
 		PlayListValidator validator = new PlayListValidator(this);
 		if (validator.IsMaster()){
-			mediaStream.rootPlaylist = new MasterPlayList(inStream);
+			mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
 		}
 		else{
-			mediaStream.rootPlaylist = new MediaPlayList(inStream);
+			mediaStream.rootPlaylist = new MediaPlayList(inStream, mediaStream);
 		}
 		
 		mediaStream.rootPlaylist.Validate(mediaStream);

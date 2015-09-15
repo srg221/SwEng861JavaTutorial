@@ -15,8 +15,11 @@ public class extTag {
 			// relative url, build complete 
 			myUrl = playList.inStream.GetUrlNoFN() + '/' + url;
 		}
-		inStream = new M3u8InputStream(myUrl);
+		inStream = new M3u8InputStream(myUrl, containingList);
 		inStream.Download();
 	}
 	
+	public void Log(String[] fields){
+		containingList.mediaStream.mErrorLogger.Log(fields);
+	}
 }

@@ -19,19 +19,25 @@ public class M3u8InputStream {
 	private InputStream mInputStream = null;
 	private File mLocalFile = null;
 	private String mLocalRootPath = "";
+	private PlayList mPlayList;
+	private boolean isRoot = false;
 	
+	// not used yet
 	void CreatePathAndLog(String localRootPath) {
 		mLocalRootPath = localRootPath;
 	}
 	
-	public M3u8InputStream(String url, String localRootPath) throws MalformedURLException 
+	public M3u8InputStream(String url, String localRootPath, PlayList containingList) throws MalformedURLException 
 	{
+		mPlayList = containingList;
 		mUrl = new URL(url);
 		mLocalRootPath = localRootPath;
+		isRoot = true;
 	}
 	
-	public M3u8InputStream(String url) throws MalformedURLException 
+	public M3u8InputStream(String url, PlayList containingList) throws MalformedURLException 
 	{
+		mPlayList = containingList;
 		mUrl = new URL(url);
 		mLocalRootPath = System.getProperty("user.home");
 	}
@@ -112,5 +118,9 @@ public class M3u8InputStream {
 		String sUrl = mUrl.toString();
 		//return sUrl.substring(0, sUrl.indexOf(fName));
 		return ((String)sUrl.subSequence(0, sUrl.lastIndexOf('/')));
+	}
+	
+	public void Log(String[] fields){
+		mPlayList.mediaStream.mErrorLogger.Log(fields);
 	}
 }
