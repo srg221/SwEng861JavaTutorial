@@ -9,6 +9,7 @@ public class SimpleLogger {
     FileWriter fileWriter;
     PrintWriter printWriter;
     int lineNumber;
+    private char delimiter = ',';
     private int paranoidLevel = 20; 
     
     // use compiler supplied default constructor
@@ -49,12 +50,14 @@ public class SimpleLogger {
     	// print line number for fields > 0
     	if ( lineNumber > 0){
     		printWriter.print(lineNumber);
+        	printWriter.print(delimiter);
     	} else {
     		printWriter.print("");
     	}
  	
     	for (String field : fields){
     		printWriter.print(field);
+    		printWriter.print(delimiter);  		
     	}
      	printWriter.println();
      	lineNumber++;

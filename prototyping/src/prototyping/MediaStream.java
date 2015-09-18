@@ -29,6 +29,8 @@ public class MediaStream {
 		// headers
 		String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
 		streamLogger.Log(msg);
+		String[] msg1 = {"Error Type", "File Name", "Line Number", "Details"};
+		streamLogger.Log(msg1);
 		// timestamp and startup info
 		//msg = { System.
 		
