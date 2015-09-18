@@ -23,7 +23,12 @@ public class PlayListValidator {
             return ret;
     }
 	
-	public void Log(String[] fields){
-		mPlayList.mediaStream.mErrorLogger.Log(fields);
+	
+	public void LogStreamError(String[] fields, int paranoidLevel){
+		mPlayList.mediaStream.LogStreamError(fields, paranoidLevel);
+	}
+
+	public void LogRunError(String[] fields, int paranoidLevel){
+		mPlayList.mediaStream.LogRunError(fields, paranoidLevel);
 	}
 }

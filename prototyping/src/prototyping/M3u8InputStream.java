@@ -93,7 +93,6 @@ public class M3u8InputStream {
 			}	
 	}
 	
-	
 	public File GetFile() 
 	{
 		return mLocalFile;
@@ -120,7 +119,12 @@ public class M3u8InputStream {
 		return ((String)sUrl.subSequence(0, sUrl.lastIndexOf('/')));
 	}
 	
-	public void Log(String[] fields){
-		mPlayList.mediaStream.mErrorLogger.Log(fields);
+	public void LogStreamError(String[] fields, int paranoidLevel){
+		mPlayList.mediaStream.LogStreamError(fields, paranoidLevel);
 	}
+
+	public void LogRunError(String[] fields, int paranoidLevel){
+		mPlayList.mediaStream.LogRunError(fields, paranoidLevel);
+	}
+	
 }

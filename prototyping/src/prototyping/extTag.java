@@ -19,7 +19,13 @@ public class extTag {
 		inStream.Download();
 	}
 	
-	public void Log(String[] fields){
-		containingList.mediaStream.mErrorLogger.Log(fields);
+
+	public void LogStreamError(String[] fields, int paranoidLevel){
+		containingList.mediaStream.LogStreamError(fields, paranoidLevel);
 	}
+
+	public void LogRunError(String[] fields, int paranoidLevel){
+		containingList.mediaStream.LogRunError(fields, paranoidLevel);
+	}
+	
 }

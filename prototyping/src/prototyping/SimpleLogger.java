@@ -9,31 +9,40 @@ public class SimpleLogger {
     FileWriter fileWriter;
     PrintWriter printWriter;
     int lineNumber;
+    private int paranoidLevel = 20; 
     
     // use compiler supplied default constructor
     SimpleLogger() { lineNumber = 0; }
     
-    public void OpenLog(String path){
-    	try {
-			fileWriter = new FileWriter(path);
-			printWriter = new PrintWriter(fileWriter, true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    SimpleLogger(String path) throws IOException{
+    	lineNumber = 0;
+    	OpenLog(path);
     }
     
-    public void CloseLog(){
+    public void OpenLog(String path) throws IOException{
+    		fileWriter = new FileWriter(path);
+			printWriter = new PrintWriter(fileWriter, true);
+    }
+    
+    public void CloseLog() throws IOException{
     	printWriter.flush();
-    	try {
 			fileWriter.flush();
 	    	printWriter.close();
 	    	fileWriter.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
+	}
+    	    
+    public void SetParanoidLevel(int level){
+    	paranoidLevel = level;
+    }
+    
+    public int GetParanoidLevel(){
+    	return paranoidLevel;
+    }
+    
+    public void Log(String[] fields, int paranoid){
+    	if (paranoid >= paranoidLevel){
+    		Log(fields);
+    	}
     }
     
     public void Log(String[] fields){
