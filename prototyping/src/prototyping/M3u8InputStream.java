@@ -15,24 +15,19 @@ import java.util.Base64;
 
 public class M3u8InputStream {
 
-	private URL mUrl = null;
+	public URL mUrl = null;
 	private InputStream mInputStream = null;
 	private File mLocalFile = null;
 	private String mLocalRootPath = "";
 	private PlayList mPlayList;
-	private boolean isRoot = false;
-	
-	// not used yet
-	void CreatePathAndLog(String localRootPath) {
-		mLocalRootPath = localRootPath;
-	}
-	
+	//private boolean isRoot = false;
+		
 	public M3u8InputStream(String url, String localRootPath, PlayList containingList) throws MalformedURLException 
 	{
 		mPlayList = containingList;
 		mUrl = new URL(url);
 		mLocalRootPath = localRootPath;
-		isRoot = true;
+		//isRoot = true;
 	}
 	
 	public M3u8InputStream(String url, PlayList containingList) throws MalformedURLException 
@@ -97,6 +92,7 @@ public class M3u8InputStream {
 	{
 		return mLocalFile;
 	}
+	
 	
 	public InputStream GetInputStream() throws IOException 
 	{

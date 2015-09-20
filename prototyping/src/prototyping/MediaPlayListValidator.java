@@ -18,7 +18,8 @@ public class MediaPlayListValidator {
 			String line = listScanner.scanner.next();
             if ( line.startsWith("#" + Tokens.EXTINF)){
             	line = listScanner.scanner.next();
-            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,line);
+            	// line here is URL, so may need not to pass
+            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, line);
             	//tag.inStream.Download();  //already done as part of inStream creation
             	mediaPlayList.validTags.add(tag);
             }

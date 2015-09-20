@@ -43,9 +43,9 @@ public class MediaStream {
 		// if rootPlayList is master iterate through mediaPlayLists 
 		// and validate (downloading media for now)
 		if (rootPlaylist.IsMaster()){
-			for (extTag tag : rootPlaylist.validTags){
+			for (ExtTagStream tag : rootPlaylist.validTags){
 				// build media playlists
-				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream, this);
+				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream, this, rootPlaylist);
 				mediaPlayLists.add(mediaPlayList);
 			}
 			for (MediaPlayList mediaPlayList : mediaPlayLists){
@@ -102,11 +102,14 @@ public class MediaStream {
 			runLogger = new SimpleLogger(runLogPath);
 		} catch (IOException e) {
 			// File Open error
-			System.out.println("Cannot create output file for run logger:\n:\n" + runLogPath);
+			System.out.println("Cannot create output file for run logger:\n" + runLogPath);
 			return false;
 		}
 		//mErrorLogHandler = new FileHandler("test.log", LOG_SIZE, LOG_ROTATION_COUNT);
 		//Logger.getLogger("").addHandler(handler);
+		System.out.println("Stream error log created:\n" + streamLogPath);
+		System.out.println("Run error log created:\n" + runLogPath);
+		
 		return true;
 	}
 	

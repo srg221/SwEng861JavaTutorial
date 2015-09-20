@@ -9,16 +9,20 @@ import java.util.List;
 public class PlayList 
 {
 	protected boolean isMaster;
-	protected    M3u8InputStream inStream;
+	protected    M3u8InputStream inStream = null;
+	protected String myURL;
+	//protected String myFileName;
 	public MediaStream mediaStream;
-	public ArrayList<extTag> validTags = new ArrayList<extTag>();
+	public ArrayList<ExtTagStream> validTags = new ArrayList<ExtTagStream>();
 	protected ArrayList<String> invalidTags = new ArrayList<String>();
 	
-	public PlayList(){};
+	protected PlayList(){};
+
 	public PlayList(String url, MediaStream inMediaStream) {
 		try {
-			inStream = new M3u8InputStream(url, this);
+			myURL = url;
 			mediaStream = inMediaStream;
+			inStream = new M3u8InputStream(url, this);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,5 +43,13 @@ public class PlayList
 	}
 	
 	public boolean IsMaster(){ return isMaster; }
+	
+	public void LogStreamError(String[] fields, int paranoidLevel){
+		mediaStream.LogStreamError(fields, paranoidLevel);
+	}
+
+	public void LogRunError(String[] fields, int paranoidLevel){
+		mediaStream.LogRunError(fields, paranoidLevel);
+	}
 }
 

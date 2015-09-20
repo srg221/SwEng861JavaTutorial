@@ -4,11 +4,11 @@ import java.io.IOException;
 
 public class PlayListValidator {
 	private PlayListScanner listScanner;
-	private PlayList mPlayList;
+	private PlayList myPlayList;
 	
-	PlayListValidator(PlayList playList) throws IOException{
-		mPlayList = playList;
-		listScanner = new PlayListScanner(playList.inStream.GetInputStream());
+	PlayListValidator(PlayList inPlayList) throws IOException{
+		myPlayList = inPlayList;
+		listScanner = new PlayListScanner(myPlayList.inStream.GetInputStream());
 	}
 	
 	public boolean IsMaster(){
@@ -25,10 +25,10 @@ public class PlayListValidator {
 	
 	
 	public void LogStreamError(String[] fields, int paranoidLevel){
-		mPlayList.mediaStream.LogStreamError(fields, paranoidLevel);
+		myPlayList.mediaStream.LogStreamError(fields, paranoidLevel);
 	}
 
 	public void LogRunError(String[] fields, int paranoidLevel){
-		mPlayList.mediaStream.LogRunError(fields, paranoidLevel);
+		myPlayList.mediaStream.LogRunError(fields, paranoidLevel);
 	}
 }
