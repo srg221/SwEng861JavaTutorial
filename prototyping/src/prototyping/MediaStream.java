@@ -41,14 +41,17 @@ public class MediaStream {
 	}
 	
 	public void Validate() throws IOException {
-		rootPlaylist.Validate(this);
+		//rootPlaylist.Validate(this);
+		rootPlaylist.Validate();
 		// if rootPlayList is master iterate through mediaPlayLists 
 		// and validate (downloading media for now)
 		if (rootPlaylist.IsMaster()){
 			for (ExtTagStream tag : rootPlaylist.validTags){
 				// build media playlists
+				if (tag.myTagName == Tokens.EXT_X_STREAM_INF){
 				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream, this, rootPlaylist);
 				mediaPlayLists.add(mediaPlayList);
+				}
 			}
 			for (MediaPlayList mediaPlayList : mediaPlayLists){
 				mediaPlayList.Validate(this);

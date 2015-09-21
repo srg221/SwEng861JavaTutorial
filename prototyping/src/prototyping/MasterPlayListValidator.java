@@ -19,7 +19,7 @@ public class MasterPlayListValidator {
 			String line = listScanner.scanner.next();
             if ( line.startsWith("#" + Tokens.EXT_X_STREAM_INF)){
             	line = listScanner.GetNextLine();
-            	MasterListExtTag tag = new MasterListExtTag(masterPlayList, listScanner, line);
+            	MasterListExtTag tag = new MasterListExtTag(masterPlayList, listScanner, line, Tokens.EXT_X_STREAM_INF);
             	// tag.inStream.Download();  //already done as part of inStream creation
             	masterPlayList.validTags.add((ExtTagStream)tag);
             }

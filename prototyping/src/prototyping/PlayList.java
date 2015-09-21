@@ -18,19 +18,24 @@ public class PlayList
 	
 	protected PlayList(){};
 
+	// this constructor only called for root when we don't know if it is a master
+	// or media yet
 	public PlayList(String url, MediaStream inMediaStream) {
 		try {
 			myURL = url;
 			mediaStream = inMediaStream;
 			inStream = new M3u8InputStream(url, this);
 		} catch (MalformedURLException e) {
+			// this exception unlikely since url was validiated in media stream
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// need to catch I/O exception here, cannot connect to root playlist URL
 		inStream.Download();
 	}
-	
-	public void Validate(MediaStream mediaStream) throws IOException{
+
+	// can remove this method and entire PlayListValidator Class
+		public void Validate(MediaStream mediaStream) throws IOException{
 		PlayListValidator validator = new PlayListValidator(this);
 		if (validator.IsMaster()){
 			mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
@@ -41,6 +46,28 @@ public class PlayList
 		
 		mediaStream.rootPlaylist.Validate(mediaStream);
 	}
+	
+	public void Validate() throws IOException{
+		PlayListScanner listScanner =  new PlayListScanner(inStream.GetInputStream());
+		//private PlayList myPlayList;
+	    boolean isMaster = false;
+			while (listScanner.scanner.hasNext()) {
+				String line = listScanner.scanner.next();
+	            if ( line.startsWith("#"+Tokens.EXT_X_STREAM_INF)){
+	            	isMaster = true;
+	            	break;
+	            }
+			}
+			if (isMaster){
+				mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
+			}
+			else{
+				mediaStream.rootPlaylist = new MediaPlayList(inStream, mediaStream);
+			}
+			
+			mediaStream.rootPlaylist.Validate(mediaStream);
+	    }
+		
 	
 	public boolean IsMaster(){ return isMaster; }
 	

@@ -14,18 +14,20 @@ public class ExtTag {
 	protected String containingListName;
 	protected String myLine;
 	protected int myLineNumber;
+	public String myTagName;
 	protected PlayListScanner playListScanner;
 	private static	Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { {"EXTM3U", "EXTM3U"}, 
 												{"EXT-X-VERSION", "EXT_X_VERSION"} };
 	
-	ExtTag(PlayList playList, PlayListScanner scanner) {
+	ExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
 		// parent reference
 		containingList = playList;
 		playListScanner = scanner;
 		myLineNumber = playListScanner.currLineNum;
 		myLine = playListScanner.currLine;
 		containingListName = containingList.myURL;
+		myTagName = tagName;
 	}
 	
 
@@ -42,8 +44,8 @@ public class ExtTag {
 		return false;
 	}
 	
-	public static ExtTag Clone(PlayList playList, PlayListScanner scanner){
-		ExtTag clone = new ExtTag(playList, scanner);
+	public static ExtTag Clone(PlayList playList, PlayListScanner scanner, String tagName){
+		ExtTag clone = new ExtTag(playList, scanner, tagName);
 		return clone;
 	}
 	

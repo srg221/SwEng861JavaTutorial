@@ -6,8 +6,8 @@ public class ExtTagStream extends ExtTag {
 
 	protected M3u8InputStream inStream;
 	
-	ExtTagStream(PlayList playList, PlayListScanner scanner, String url) throws MalformedURLException{
-		super(playList, scanner);
+	ExtTagStream(PlayList playList, PlayListScanner scanner, String url, String tagName) throws MalformedURLException{
+		super(playList, scanner, tagName);
 		String myUrl = url;
 		if (!Tokens.urlPattern.matcher(url).matches()){
 			// relative url, build complete 
@@ -17,8 +17,8 @@ public class ExtTagStream extends ExtTag {
 		inStream.Download();
 	}	
 	
-	public static ExtTagStream Clone(PlayList playList, PlayListScanner scanner, String url) throws MalformedURLException{
-		ExtTagStream clone = new ExtTagStream(playList, scanner, url);
+	public static ExtTagStream Clone(PlayList playList, PlayListScanner scanner, String url, String tagName) throws MalformedURLException{
+		ExtTagStream clone = new ExtTagStream(playList, scanner, url, tagName);
 		return clone;
 	}
 }
