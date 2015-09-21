@@ -11,7 +11,7 @@ public class PlayListScanner {
 	
 	PlayListScanner( InputStream inStream ) 
 	{
-		scanner = new Scanner(inStream).useDelimiter("\\r?\\n");  //return followed by newline
+		scanner = new Scanner(inStream).useDelimiter(Tokens.endLine);  //return followed by newline
 	}
 	
 	public String GetNextLine(){

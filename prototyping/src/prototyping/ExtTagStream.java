@@ -9,7 +9,7 @@ public class ExtTagStream extends ExtTag {
 	ExtTagStream(PlayList playList, PlayListScanner scanner, String url) throws MalformedURLException{
 		super(playList, scanner);
 		String myUrl = url;
-		if (!Tokens.URL_PATTERN.matcher(url).matches()){
+		if (!Tokens.urlPattern.matcher(url).matches()){
 			// relative url, build complete 
 			myUrl = playList.inStream.GetUrlNoFN() + '/' + url;
 		}
