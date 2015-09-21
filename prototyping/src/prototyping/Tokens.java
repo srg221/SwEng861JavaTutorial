@@ -8,6 +8,7 @@ public class Tokens {
 
     // media playlist tokens
     public static  String EXTINF = "EXTINF";
+    public static String EXTM3U = "EXTM3U";
     
     // patterns
     public static Pattern URL_PATTERN2 = Pattern.compile("^(?:https?|ftp)://[^\\s/$.?#]*\\.[^\\s]*$");

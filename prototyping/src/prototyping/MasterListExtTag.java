@@ -12,4 +12,8 @@ public class MasterListExtTag extends ExtTagStream {
 		MasterListExtTag clone = new MasterListExtTag(playList, scanner, url);
 		return clone;
 	}
+	
+	public static void Initialize(){
+		
+	}
 }

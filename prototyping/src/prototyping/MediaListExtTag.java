@@ -12,4 +12,8 @@ public class MediaListExtTag extends ExtTagStream {
 		MediaListExtTag clone = new MediaListExtTag(playList, scanner, url);
 		return clone;
 	}
+	
+	public static void Initialize(){
+		
+	}
 }

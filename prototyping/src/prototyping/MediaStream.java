@@ -17,7 +17,7 @@ public class MediaStream {
 	private SimpleLogger runLogger = null;
 	//public Handler mErrorLogHandler = null;
 	
-	MediaStream(String rootUrl) {
+	MediaStream(String rootUrl) throws NoSuchMethodException, SecurityException {
 
 		if (!CreateLoggers(rootUrl)){
 			System.out.println("Non-recoverable runtime context error - Exiting...");
@@ -33,7 +33,9 @@ public class MediaStream {
 		streamLogger.Log(msg1);
 		// timestamp and startup info
 		//msg = { System.
-		
+		ExtTag.Initialize();
+		//MasterListExtTag.Initialize();
+		//MediaListExtTag.Initialize();
 		rootPlaylist = new PlayList(rootUrl, this);
 		
 	}

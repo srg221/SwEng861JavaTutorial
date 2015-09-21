@@ -41,7 +41,7 @@ public class SimpleLogger {
     }
     
     public void Log(String[] fields, int paranoid){
-    	if (paranoid >= paranoidLevel){
+    	if (paranoid <= paranoidLevel){
     		Log(fields);
     	}
     }

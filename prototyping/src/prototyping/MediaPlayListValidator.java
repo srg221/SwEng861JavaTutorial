@@ -1,6 +1,7 @@
 package prototyping;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
 public class MediaPlayListValidator {
@@ -12,7 +13,7 @@ public class MediaPlayListValidator {
 		listScanner = new PlayListScanner(playList.inStream.GetInputStream());
 	}
 	
-	public void Validate() throws MalformedURLException{
+	public void Validate() throws IllegalArgumentException, InvocationTargetException, Exception{
 		
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.scanner.next();
@@ -21,6 +22,11 @@ public class MediaPlayListValidator {
             	// line here is URL, so may need not to pass
             	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, line);
             	//tag.inStream.Download();  //already done as part of inStream creation
+            	// testing
+            	if (ExtTag.HasValidator(Tokens.EXTM3U)){
+            		ExtTag TestTag =  new ExtTag(mediaPlayList,listScanner);
+            		TestTag.Validate(Tokens.EXTM3U);
+            	}
             	mediaPlayList.validTags.add(tag);
             }
 		}
