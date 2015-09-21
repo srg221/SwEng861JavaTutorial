@@ -29,7 +29,7 @@ public class Tokens {
 	public static String EXT_X_VERSION = "EXT-X-VERSION";
 	// Tag Match Patterns
 	public static Pattern EXTM3Upattern = Pattern.compile(beginLineExp+EXTM3U+"$");
-	//public static Pattern PAT_EXT_X_VERSION = Pattern.compile("^#"+EXT_X_VERSION+tagEnd+"("+integerRegExp+")$");
+	//public static Pattern EXT_X_VERSIONpattern = Pattern.compile("^#"+EXT_X_VERSION+tagEnd+"("+integerRegExp+")$");
 	public static Pattern EXT_X_VERSIONpattern = Pattern.compile(beginLineExp+EXT_X_VERSION+tagEnd+"("+integerRegExp+")$");
 
     // master playlist tokens   
