@@ -2,8 +2,11 @@ package prototyping;
 
 import java.io.IOException;
 //import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 public class MasterPlayList extends PlayList {
+	
+	public ArrayList<ExtTagStream> validMediaPlayLists = new ArrayList<ExtTagStream>();
 	
 	public MasterPlayList(String url, MediaStream mediaStream) {
 		super(url, mediaStream);

@@ -3,11 +3,12 @@ package prototyping;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 public class MediaPlayList extends PlayList {
 
 	public MasterPlayList masterPlayList = null; //referring list, or if this is root remains null
-	
+	public ArrayList<ExtTagStream> validMediaStreams = new ArrayList<ExtTagStream>();
 	public MediaPlayList(String url, MediaStream inMediaStream, PlayList master) {
 		super(url, inMediaStream);
 		masterPlayList = (MasterPlayList) master;

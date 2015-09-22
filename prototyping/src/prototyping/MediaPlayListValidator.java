@@ -20,14 +20,14 @@ public class MediaPlayListValidator {
             if ( line.startsWith("#" + Tokens.EXTINF)){
             	line = listScanner.scanner.next();
             	// line here is URL, so may need not to pass
-            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, line, Tokens.EXTINF);
+            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, Tokens.EXTINF, line);
             	//tag.inStream.Download();  //already done as part of inStream creation
             	// testing
             	if (ExtTag.HasValidator(Tokens.EXTM3U)){
             		ExtTag TestTag =  new ExtTag( mediaPlayList, listScanner, Tokens.EXTM3U);
             		TestTag.Validate(Tokens.EXTM3U);
             	}
-            	mediaPlayList.validTags.add(tag);
+            	mediaPlayList.validStreamTags.add(tag);
             }
 		}
 	}

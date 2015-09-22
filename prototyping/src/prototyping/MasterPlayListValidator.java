@@ -1,6 +1,7 @@
 package prototyping;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
 public class MasterPlayListValidator {
@@ -19,14 +20,14 @@ public class MasterPlayListValidator {
 			String line = listScanner.scanner.next();
             if ( line.startsWith("#" + Tokens.EXT_X_STREAM_INF)){
             	line = listScanner.GetNextLine();
-            	MasterListExtTag tag = new MasterListExtTag(masterPlayList, listScanner, line, Tokens.EXT_X_STREAM_INF);
+            	MasterListExtTag tag = new MasterListExtTag(masterPlayList, listScanner, Tokens.EXT_X_STREAM_INF, line);
             	// tag.inStream.Download();  //already done as part of inStream creation
-            	masterPlayList.validTags.add((ExtTagStream)tag);
+            	masterPlayList.validStreamTags.add((ExtTagStream)tag);
             }
 		}
 	}
 	
-	public void ValidateEx(){
+	public void ValidateEx() throws IllegalArgumentException, InvocationTargetException, Exception{
 		
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.scanner.next();
@@ -50,6 +51,12 @@ public class MasterPlayListValidator {
 			// Set candidateTag = to EXTM3U or everything up to end tag
 			//    need to have error it no endtag found
 			// try candidate on each tag type, when find, create tag and validate
+			String candidateTag = ExtTag.GetCandidateTag(line);
+			if (ExtTag.HasValidator(candidateTag)){
+				ExtTag extTag =  new ExtTag(masterPlayList, listScanner, candidateTag);
+				extTag.Validate(candidateTag);
+			}
+
 			
 			
 		}
