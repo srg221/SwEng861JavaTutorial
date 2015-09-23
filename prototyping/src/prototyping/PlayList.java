@@ -13,7 +13,7 @@ public class PlayList
 	protected String myURL;
 	//protected String myFileName;
 	public MediaStream mediaStream;
-	public ArrayList<ExtTagStream> validStreamTags = new ArrayList<ExtTagStream>(); //temp
+	public ArrayList<ExtTag> validTags = new ArrayList<ExtTag>(); 
 	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();
 	
 	protected PlayList(){};
@@ -52,13 +52,21 @@ public class PlayList
 		//private PlayList myPlayList;
 	    boolean isMaster = false;
 			while (listScanner.scanner.hasNext()) {
-				String line = listScanner.scanner.next();
+				String line = listScanner.GetNextLine();
 	            //if ( line.startsWith("#"+Tokens.EXT_X_STREAM_INF)){
             	String candidateTag = ExtTag.GetCandidateTag(line);
-				if ( Tokens.EXT_X_STREAM_INFpattern.matcher(candidateTag).matches()){
-	            	isMaster = true;
-	            	break;
-	            }
+            	if (MasterListExtTag.HasValidator(candidateTag)){
+            		isMaster = true;
+ 	            	break;
+            	}
+            	if (MediaListExtTag.HasValidator(candidateTag)){
+            		isMaster = false;
+ 	            	break;
+            	}
+//				if ( Tokens.EXT_X_STREAM_INFpattern.matcher(candidateTag).matches()){
+//	            	isMaster = true;
+//	            	break;
+//	            }
 			}
 			if (isMaster){
 				mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);

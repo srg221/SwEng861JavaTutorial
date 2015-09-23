@@ -6,12 +6,14 @@ import java.util.Scanner;
 public class PlayListScanner {
 
 	public Scanner scanner;
-	public int currLineNum = 1;
-	public String currLine = "";
+	public int currLineNum;
+	public String currLine;
 	
 	PlayListScanner( InputStream inStream ) 
 	{
 		scanner = new Scanner(inStream).useDelimiter(Tokens.endLine);  //return followed by newline
+		currLine = new String("");
+		currLineNum = 0;
 	}
 	
 	public String GetNextLine(){

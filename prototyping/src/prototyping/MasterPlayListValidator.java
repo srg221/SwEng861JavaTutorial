@@ -22,7 +22,7 @@ public class MasterPlayListValidator {
             	line = listScanner.GetNextLine();
             	MasterListExtTag tag = new MasterListExtTag(masterPlayList, listScanner, Tokens.EXT_X_STREAM_INF, line);
             	// tag.inStream.Download();  //already done as part of inStream creation
-            	masterPlayList.validStreamTags.add((ExtTagStream)tag);
+            	masterPlayList.validTags.add((ExtTagStream)tag);
             }
 		}
 	}
@@ -30,7 +30,7 @@ public class MasterPlayListValidator {
 	public void ValidateEx() throws IllegalArgumentException, InvocationTargetException, Exception{
 		
 		while (listScanner.scanner.hasNext()) {
-			String line = listScanner.scanner.next();
+			String line = listScanner.GetNextLine();
 			// line formatting checks
 			// check if comment
 			if (line.startsWith(Tokens.beginLine) && !line.startsWith(Tokens.tagBegin))
@@ -55,10 +55,41 @@ public class MasterPlayListValidator {
 			if (ExtTag.HasValidator(candidateTag)){
 				ExtTag extTag =  new ExtTag(masterPlayList, listScanner, candidateTag);
 				extTag.Validate(candidateTag);
+				if (extTag.IsValid()){
+					masterPlayList.validTags.add(extTag);
+				}
+				else{
+					masterPlayList.inValidExtTags.add(extTag);
+				}
+				continue;
 			}
-
-			
-			
+			if (MasterListExtTag.HasValidator(candidateTag)){
+				MasterListExtTag extTag =  new MasterListExtTag(masterPlayList, listScanner, candidateTag);
+				extTag.Validate(candidateTag);
+				if (extTag.IsValid()){
+					masterPlayList.validTags.add(extTag);
+				}
+				else{
+					masterPlayList.inValidExtTags.add(extTag);
+				}
+				continue;
+			}
+			// check for Media tags in Master - each media tag validator should log error
+			// anything with a stream should not download it, should it advance scanner?
+			if (MediaListExtTag.HasValidator(candidateTag)){
+				MediaListExtTag extTag =  new MediaListExtTag(masterPlayList, listScanner, candidateTag);
+				extTag.Validate(candidateTag);
+				if (extTag.IsValid()){
+					assert(false);
+					// log runtime error
+				}
+				else{
+					// log MediaList tag in MasterList
+					masterPlayList.inValidExtTags.add(extTag);
+				}
+				continue;
+			}
+			// log message runtime error	
 		}
 		
 	}

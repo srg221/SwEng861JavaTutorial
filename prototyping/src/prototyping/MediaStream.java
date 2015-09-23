@@ -46,17 +46,18 @@ public class MediaStream {
 		// if rootPlayList is master iterate through mediaPlayLists 
 		// and validate (downloading media for now)
 		if (rootPlaylist.IsMaster()){
-			for (ExtTagStream tag : rootPlaylist.validStreamTags){
+			for (ExtTag tag : rootPlaylist.validTags){
 				// build media playlists
-				if (tag.myTagName == Tokens.EXT_X_STREAM_INF){
-				MediaPlayList mediaPlayList = new MediaPlayList(tag.inStream, this, rootPlaylist);
-				mediaPlayLists.add(mediaPlayList);
+				if (tag.myTagName.equals(Tokens.EXT_X_STREAM_INF)){
+					ExtTagStream extTagStream = (ExtTagStream) tag;
+					MediaPlayList mediaPlayList = new MediaPlayList(extTagStream.inStream, this, rootPlaylist);
+					mediaPlayLists.add(mediaPlayList);
 				}
 			}
 			for (MediaPlayList mediaPlayList : mediaPlayLists){
 				mediaPlayList.Validate(this);
 			}
-			
+			// todo - cross list validate
 		}
 	}
 

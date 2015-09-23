@@ -45,7 +45,7 @@ public class MediaPlayList extends PlayList {
 		// pick out #EXTINF tags, create MediaListExtTags (& download urls)
 		MediaPlayListValidator validator = new MediaPlayListValidator(this);
 	    try {
-			validator.Validate();
+			validator.ValidateEx();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,7 +1,7 @@
 package prototyping;
 
 import java.io.IOException;
-
+// todo - delete this class
 public class PlayListValidator {
 	private PlayListScanner listScanner;
 	private PlayList myPlayList;

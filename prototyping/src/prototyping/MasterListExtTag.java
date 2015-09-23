@@ -53,6 +53,11 @@ public class MasterListExtTag extends ExtTagStream {
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
 	private void EXT_X_STREAM_INF(){
+		if (!containingList.IsMaster()){
+			
+			validated = false;
+			return;
+		}
 		// need to download
 		boolean success = false;
 		if (playListScanner.scanner.hasNext()){
@@ -68,12 +73,14 @@ public class MasterListExtTag extends ExtTagStream {
 			LogRunError(msg, 20);
 			// leave validated = false;
 		}
+		
+		validated = true;
 	}
 	
 	private void EXT_X_MEDIA(){
 		String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
 		LogRunError(msg, 20);
-		validated = false;
+		validated = true;
 	}
 	
 }
