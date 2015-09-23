@@ -66,7 +66,7 @@ public class MediaListExtTag extends ExtTagStream {
 	// private static void EXTINF(ExtTag This)
 	private void EXTINF() {
 		// need to download
-		boolean success = false;
+		//boolean success = false;
 		if (playListScanner.scanner.hasNext()) {
 			String urlLine = playListScanner.GetNextLine();
 			if (true) // is not a tag, i.e. a missing line
@@ -78,48 +78,37 @@ public class MediaListExtTag extends ExtTagStream {
 			// log error end of file
 			String[] msg = { "Error Number", "Error Type", "File Name",
 					"Line Number", "Details" };
-			LogRunError(msg, 20);
+			//LogRunError(msg, 20);
 			// leave validated = false;
 		}
 		// String[] msg = {"Error Number", "Error Type", "File Name",
 		// "Line Number", "Details"};
 		// LogRunError(msg, 20);
 		validated = true;
-		;
 	}
 
 	private void EXT_X_MEDIA_SEQUENCE() {
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+
 		validated = true;
 	}
 
 	private void EXT_X_ENDLIST() {
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+
 		validated = true;
 	}
 
 	private void EXT_X_TARGETDURATION() {
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+
 		validated = true;
 	}
 
 	private void EXT_X_START() {
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+
 		validated = true;
 	}
 
 	private void EXT_X_PLAYLIST_TYPE() {
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+
 		validated = true;
 	}
 }

@@ -2,10 +2,14 @@ package prototyping;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.lang.reflect.*;
 import java.util.*;
+
+import prototyping.PlayList.MSG;
 
 
 
@@ -35,14 +39,6 @@ public class ExtTag {
 	
 	public boolean IsValid() { return validated;}
 	
-	public void LogStreamError(String[] fields, int paranoidLevel){
-		containingList.mediaStream.LogStreamError(fields, paranoidLevel);
-	}
-
-	public void LogRunError(String[] fields, int paranoidLevel){
-		containingList.mediaStream.LogRunError(fields, paranoidLevel);
-	}
-		
 	public static ExtTag Clone(PlayList playList, PlayListScanner scanner, String tagName){
 		ExtTag clone = new ExtTag(playList, scanner, tagName);
 		return clone;
@@ -89,8 +85,6 @@ public class ExtTag {
 		
 	//private static void EXTM3U(ExtTag This)
 	private void EXTM3U(){
-		String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
-		LogRunError(msg, 20);
 		validated = true;
 	}
 	
@@ -99,4 +93,88 @@ public class ExtTag {
 		
 		validated = true;
 	}
+	
+	// logging utils at ExtTag level
+	// More logging stuff/utilities
+
+	// some wrappers to make code reading easier, would be simpler
+    // if java let you overload operators
+//    public class MSG{
+//    	private String[] fields;
+//    	//private String[] fixedFields;
+//    	
+//    	public MSG(String... infields){
+//    		fields[0] =  Integer.toString(myLineNumber);
+//    		fields[1] = myTagName;
+//    		int i = 1;
+//    		for (String field : infields){
+//    			fields[i++] = new String(field);
+//    		}
+//    	}
+//    }
+    
+    public class MSG{
+    	private ArrayList<String> fields;
+    	
+    	public MSG(String... infields){
+    		fields = new ArrayList<String>();
+    		fields.add(Integer.toString(myLineNumber));
+    		fields.add(myTagName);
+    		for (String field : infields){
+    			fields.add(field);
+    		}
+    	}
+    	
+	   	// for contained
+    	public MSG(ArrayList<String> infields){
+	       		fields = new ArrayList<String>();
+	    		fields.add(Integer.toString(myLineNumber));
+	    		fields.add(myTagName);
+	    		for (String field : infields){
+	    			fields.add(field);
+	    		}
+    	}
+    }
+    
+ 	// for use at this level	
+	public void LogStreamError(MSG msg){
+		containingList.LogStreamError(msg.fields);
+	}
+
+	public void LogTrace(MSG msg){
+		containingList.LogTrace(msg.fields);
+	}
+	
+	public void LogStreamError(MSG msg, int paranoid){
+		containingList.LogStreamError(msg.fields, paranoid);
+	}
+
+	public void LogTrace(MSG msg, int paranoid){
+		containingList.LogTrace(msg.fields, paranoid);
+	}
+	
+	// for contained levels
+	public void LogStreamError(ArrayList<String> fields){
+		MSG msg = new MSG(fields);
+		containingList.LogStreamError(msg.fields);
+	}
+
+	public void LogTrace(ArrayList<String> fields){
+		MSG msg = new MSG(fields);
+		containingList.LogTrace(msg.fields);
+	}
+	
+	public void LogStreamError(ArrayList<String> fields, int paranoid){
+		MSG msg = new MSG(fields);
+		containingList.LogStreamError(msg.fields, paranoid);
+	}
+
+	public void LogTrace(ArrayList<String> fields, int paranoid){
+		MSG msg = new MSG(fields);
+		containingList.LogTrace(msg.fields, paranoid);
+	}
+	
+	
 }
+
+

@@ -15,7 +15,7 @@ public class ExtTagStream extends ExtTag {
 			// relative url, build complete 
 			myUrl = playList.inStream.GetUrlNoFN() + '/' + url;
 		}
-		inStream = new M3u8InputStream(myUrl, containingList);
+		inStream = new M3u8InputStream(myUrl, containingList, this);
 		inStream.Download();
 		}
 	}	

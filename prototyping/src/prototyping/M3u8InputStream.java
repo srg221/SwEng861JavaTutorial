@@ -9,9 +9,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import java.util.Base64;
 //import java.util.logging.Handler;
 //import java.util.logging.Logger;
+
+
+import prototyping.ExtTag.MSG;
 
 public class M3u8InputStream {
 
@@ -20,6 +24,7 @@ public class M3u8InputStream {
 	private File mLocalFile = null;
 	private String mLocalRootPath = "";
 	private PlayList mPlayList;
+	private ExtTag mTag = null;
 	//private boolean isRoot = false;
 		
 	public M3u8InputStream(String url, String localRootPath, PlayList containingList) throws MalformedURLException 
@@ -33,6 +38,23 @@ public class M3u8InputStream {
 	public M3u8InputStream(String url, PlayList containingList) throws MalformedURLException 
 	{
 		mPlayList = containingList;
+		mUrl = new URL(url);
+		mLocalRootPath = System.getProperty("user.home");
+	}
+	
+	public M3u8InputStream(String url, String localRootPath, PlayList containingList, ExtTag containingTag) throws MalformedURLException 
+	{
+		mPlayList = containingList;
+		mTag = containingTag;
+		mUrl = new URL(url);
+		mLocalRootPath = localRootPath;
+		//isRoot = true;
+	}
+	
+	public M3u8InputStream(String url, PlayList containingList, ExtTag containingTag) throws MalformedURLException 
+	{
+		mPlayList = containingList;
+		mTag = containingTag;
 		mUrl = new URL(url);
 		mLocalRootPath = System.getProperty("user.home");
 	}
@@ -82,9 +104,14 @@ public class M3u8InputStream {
 			FileOutputStream fos = new FileOutputStream(mLocalFile);
 			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 			fos.close();	
+			// testing
+			MSG msg = new MSG("Connected to URL");
+			LogStreamError(msg);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				MSG msg = new MSG("Could not download this URL");
+				LogStreamError(msg);
 			}	
 	}
 	
@@ -115,12 +142,75 @@ public class M3u8InputStream {
 		return ((String)sUrl.subSequence(0, sUrl.lastIndexOf('/')));
 	}
 	
-	public void LogStreamError(String[] fields, int paranoidLevel){
-		mPlayList.mediaStream.LogStreamError(fields, paranoidLevel);
-	}
 
-	public void LogRunError(String[] fields, int paranoidLevel){
-		mPlayList.mediaStream.LogRunError(fields, paranoidLevel);
-	}
-	
+	// logging utils at ExtTag level
+	// More logging stuff/utilities
+
+	// some wrappers to make code reading easier, would be simpler
+    // if java let you overload operators
+	   public class MSG{
+	    	private ArrayList<String> fields;
+	    	
+	    	public MSG(String... infields){
+	    		fields = new ArrayList<String>();
+	    		for (String field : infields){
+	    			fields.add(field);
+	    		}
+	    	}
+	    	
+		   	// for contained
+	    	public MSG(ArrayList<String> infields){
+		       		fields = new ArrayList<String>();
+		    		for (String field : infields){
+		    			fields.add(field);
+		    		}
+	    	}
+	    }
+	    
+	 	// for use at this level	
+		public void LogStreamError(MSG msg){
+			if (mTag != null)
+				mTag.LogStreamError(msg.fields);
+			else{
+				// todo add 2 blanks MSG newMsg = new MSG("","",msg);
+				mPlayList.LogStreamError(msg.fields);
+			}
+		}
+
+		public void LogTrace(MSG msg){
+			if (mTag != null)
+				mTag.LogTrace(msg.fields);
+		}
+		
+		public void LogStreamError(MSG msg, int paranoid){
+			if (mTag != null)
+				mTag.LogStreamError(msg.fields, paranoid);
+		}
+
+		public void LogTrace(MSG msg, int paranoid){
+			if (mTag != null)
+				mTag.LogTrace(msg.fields, paranoid);
+		}
+		
+		// for contained levels - probably don't exist
+		public void LogStreamError(ArrayList<String> fields){
+			MSG msg = new MSG(fields);
+			mTag.LogStreamError(msg.fields);
+		}
+
+		public void LogTrace(ArrayList<String> fields){
+			MSG msg = new MSG(fields);
+			mTag.LogTrace(msg.fields);
+		}
+		
+		public void LogStreamError(ArrayList<String> fields, int paranoid){
+			MSG msg = new MSG(fields);
+			mTag.LogStreamError(msg.fields, paranoid);
+		}
+
+		public void LogTrace(ArrayList<String> fields, int paranoid){
+			MSG msg = new MSG(fields);
+			mTag.LogTrace(msg.fields, paranoid);
+		}
+		
 }

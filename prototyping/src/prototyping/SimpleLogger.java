@@ -3,6 +3,8 @@ package prototyping;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleLogger {
 	
@@ -46,6 +48,7 @@ public class SimpleLogger {
     	}
     }
     
+    
     public void Log(String[] fields){
     	// print line number for fields > 0
     	if ( lineNumber > 0){
@@ -69,6 +72,20 @@ public class SimpleLogger {
 			e.printStackTrace();
 		}
     }
-
-
+    
+    public void Log(ArrayList<String> fields){
+    	String[] strFields = new String[fields.size()];
+    	int i = 0;
+    	for (String str : fields){
+    		strFields[i] = str;
+    	}
+    	Log(strFields);
+    }
+    
+    public void Log(ArrayList<String> fields, int paranoid){
+    	if (paranoid <= paranoidLevel){
+    		Log(fields);
+    	}
+    }
+ 
 }

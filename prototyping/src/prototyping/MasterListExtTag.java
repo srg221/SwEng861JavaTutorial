@@ -59,7 +59,7 @@ public class MasterListExtTag extends ExtTagStream {
 			return;
 		}
 		// need to download
-		boolean success = false;
+		//boolean success = false;
 		if (playListScanner.scanner.hasNext()){
 			String urlLine = playListScanner.GetNextLine();
 			if (true) // is not a tag, i.e. a missing line
@@ -69,8 +69,6 @@ public class MasterListExtTag extends ExtTagStream {
 		}
 		else {
 			// log error end of file
-			String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
-			LogRunError(msg, 20);
 			// leave validated = false;
 		}
 		
@@ -78,8 +76,6 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	private void EXT_X_MEDIA(){
-		String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
-		LogRunError(msg, 20);
 		validated = true;
 	}
 	

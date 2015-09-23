@@ -14,37 +14,39 @@ public class MediaStream {
 	public ArrayList<MediaPlayList> mediaPlayLists = new ArrayList<MediaPlayList>();
 	// TODO setup logger and path in constructor
 	private SimpleLogger streamLogger = null;
-	private SimpleLogger runLogger = null;
+	private SimpleLogger traceLogger = null;
 	//public Handler mErrorLogHandler = null;
 	
 	MediaStream(String rootUrl) throws NoSuchMethodException, SecurityException {
 
+		// create logs
 		if (!CreateLoggers(rootUrl)){
 			System.out.println("Non-recoverable runtime context error - Exiting...");
 			System.exit(-1);
 		}
-		// rin at max paranoids unless someone sets lower
+		// using max paranoids unless someone sets lower
 		streamLogger.SetParanoidLevel(100);
-		runLogger.SetParanoidLevel(100);
-		// headers
-		String[] msg = {"Error Number", "Error Type", "File Name", "Line Number", "Details"};
-		streamLogger.Log(msg);
-		String[] msg1 = {"Error Type", "File Name", "Line Number", "Details"};
-		streamLogger.Log(msg1);
-		// timestamp and startup info
-		//msg = { System.
-		ExtTag.Initialize();
-		//MasterListExtTag.Initialize();
-		//MediaListExtTag.Initialize();
-		rootPlaylist = new PlayList(rootUrl, this);
+		traceLogger.SetParanoidLevel(100);
 		
+		// headers 
+		MSG msg = new MSG("File Name", "Line Number", "Error Type", "Details");
+		LogStreamError(msg);
+		// todo - timestamp startup 
+		//msg = new MSG("Start Time:", get the time);
+		//LogTrace(msg);
+
+		//Initialize the validators
+		ExtTag.Initialize();  // this also calls down to leafs
+		
+		// create the root playlist
+		rootPlaylist = new PlayList(rootUrl, this);	
 	}
 	
 	public void Validate() throws IOException {
-		//rootPlaylist.Validate(this);
+		//validate the root
 		rootPlaylist.Validate();
-		// if rootPlayList is master iterate through mediaPlayLists 
-		// and validate (downloading media for now)
+		// if rootPlayList is a master iterate through mediaPlayLists 
+		// and validate (downloading media playlists as required)
 		if (rootPlaylist.IsMaster()){
 			for (ExtTag tag : rootPlaylist.validTags){
 				// build media playlists
@@ -54,10 +56,12 @@ public class MediaStream {
 					mediaPlayLists.add(mediaPlayList);
 				}
 			}
+			// validate the children media play lists downloading .TS 
+			// files as you go
 			for (MediaPlayList mediaPlayList : mediaPlayLists){
 				mediaPlayList.Validate(this);
 			}
-			// todo - cross list validate
+			// todo - cross list validate since we have all the info
 		}
 	}
 
@@ -70,7 +74,7 @@ public class MediaStream {
 		try {
 			tmpURL = new URL(rootUrl);
 		} catch (MalformedURLException e) {
-			// Bad URL
+			// Bad URL - need to log to console since can't make logs
 			System.out.println("Bad root URL, cannot parse:\n" + rootUrl);
 			return false;
 		} 
@@ -80,7 +84,7 @@ public class MediaStream {
 		relativePath.mkdirs();
 		// find root file name to build log filenames
 		String rootFileName = localPath.substring(localPath.lastIndexOf('/'));
-		// paranoid
+		// paranoid here
 		//String LRootFileName = rootFileName.toLowerCase();
 		rootFileName = (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
 		// make complete paths, delete files if they already exist
@@ -96,7 +100,8 @@ public class MediaStream {
 		{
 			streamLogFile.delete();
 		}
-		// non-recoverable runtime context errors
+		// non-recoverable runtime errors, can't create log files,
+		// let console know and exit
 		try {
 			streamLogger = new SimpleLogger(streamLogPath);
 		} catch (IOException e) {
@@ -105,26 +110,92 @@ public class MediaStream {
 			return false;
 		}
 		try {
-			runLogger = new SimpleLogger(runLogPath);
+			traceLogger = new SimpleLogger(runLogPath);
 		} catch (IOException e) {
 			// File Open error
 			System.out.println("Cannot create output file for run logger:\n" + runLogPath);
 			return false;
 		}
-		//mErrorLogHandler = new FileHandler("test.log", LOG_SIZE, LOG_ROTATION_COUNT);
-		//Logger.getLogger("").addHandler(handler);
+
 		System.out.println("Stream error log created:\n" + streamLogPath);
 		System.out.println("Run error log created:\n" + runLogPath);
-		
+		// success if get this far
 		return true;
 	}
 	
+	// logging utils
 	public void LogStreamError(String[] fields, int paranoidLevel){
 		streamLogger.Log(fields, paranoidLevel);
 	}
 
-	public void LogRunError(String[] fields, int paranoidLevel){
-		runLogger.Log(fields, paranoidLevel);
+	public void LogTrace(String[] fields, int paranoidLevel){
+		traceLogger.Log(fields, paranoidLevel);
 	}
 
+	public void LogStreamError(String[] fields){
+		streamLogger.Log(fields);
+	}
+
+	public void LogTrace(String[] fields){
+		traceLogger.Log(fields);
+	}
+
+	// some wrappers to make code reading easier, would be simpler
+    // if java let you overload operators
+    public class MSG{
+    	private ArrayList<String> fields;
+    	
+    	public MSG(String... infields){
+    		fields = new ArrayList<String>();
+    		for (String field : infields){
+    			fields.add(field);
+    		}
+    	}
+    	
+    	public MSG(ArrayList<String> infields){
+       		fields = new ArrayList<String>();
+    		for (String field : infields){
+    			fields.add(field);
+    		}
+    	}
+    }
+    
+    // for local
+ 	public void LogStreamError(MSG msg, int paranoidLevel){
+		streamLogger.Log(msg.fields, paranoidLevel);
+	}
+
+	public void LogTrace(MSG msg, int paranoidLevel){
+		traceLogger.Log(msg.fields, paranoidLevel);
+	}
+	
+	public void LogStreamError(MSG msg){
+		streamLogger.Log(msg.fields);
+	}
+
+	public void LogTrace(MSG msg){
+		traceLogger.Log(msg.fields);
+	}
+	
+	// for contained
+ 	public void LogStreamError(ArrayList<String> fields, int paranoidLevel){
+		MSG msg = new MSG(fields);
+ 		streamLogger.Log(msg.fields, paranoidLevel);
+	}
+
+	public void LogTrace(ArrayList<String> fields, int paranoidLevel){
+		MSG msg = new MSG(fields);
+		traceLogger.Log(msg.fields, paranoidLevel);
+	}
+	
+	public void LogStreamError(ArrayList<String> fields){
+		MSG msg = new MSG(fields);
+ 		streamLogger.Log(msg.fields);
+	}
+
+	public void LogTrace(ArrayList<String> fields){
+		MSG msg = new MSG(fields);
+		traceLogger.Log(msg.fields);
+	}
+	
 }

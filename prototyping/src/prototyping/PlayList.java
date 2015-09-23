@@ -6,6 +6,8 @@ import java.util.ArrayList;
 //import java.util.Collections;
 import java.util.List;
 
+import prototyping.MediaStream.MSG;
+
 public class PlayList 
 {
 	protected boolean isMaster;
@@ -63,10 +65,6 @@ public class PlayList
             		isMaster = false;
  	            	break;
             	}
-//				if ( Tokens.EXT_X_STREAM_INFpattern.matcher(candidateTag).matches()){
-//	            	isMaster = true;
-//	            	break;
-//	            }
 			}
 			if (isMaster){
 				mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
@@ -81,12 +79,83 @@ public class PlayList
 	
 	public boolean IsMaster(){ return isMaster; }
 	
-	public void LogStreamError(String[] fields, int paranoidLevel){
-		mediaStream.LogStreamError(fields, paranoidLevel);
-	}
+	// More logging stuff/utilities
 
-	public void LogRunError(String[] fields, int paranoidLevel){
-		mediaStream.LogRunError(fields, paranoidLevel);
+	// some wrappers to make code reading easier, would be simpler
+    // if java let you overload operators
+//    public class MSG{
+//    	private String[] fields;
+//    	//private String[] fixedFields;
+//    	
+//    	public MSG(String... infields){
+//    		fields[0] = myURL;
+//    		int i = 1;
+//    		for (String field : infields){
+//    			fields[i++] = new String(field);
+//    		}
+//    	}
+//    }
+    
+    public class MSG{
+    	private ArrayList<String> fields;
+    	
+    	public MSG(String... infields){
+    		fields = new ArrayList<String>();
+    		fields.add(myURL);
+    		for (String field : infields){
+    			fields.add(field);
+    		}
+    	}
+ 
+	   	// for contained
+    	public MSG(ArrayList<String> infields){
+	       		fields = new ArrayList<String>();
+	    		fields.add(myURL);
+	    		for (String field : infields){
+	    			fields.add(field);
+	    		}
+    	}
+    }
+    
+	 	// for use at this level	
+		public void LogStreamError(MSG msg){
+			mediaStream.LogStreamError(msg.fields);
+		}
+	
+		public void LogTrace(MSG msg){
+			mediaStream.LogTrace(msg.fields);
+		}
+		
+		public void LogStreamError(MSG msg, int paranoid){
+			mediaStream.LogStreamError(msg.fields, paranoid);
+		}
+	
+		public void LogTrace(MSG msg, int paranoid){
+			mediaStream.LogTrace(msg.fields, paranoid);
+		}
+		
+		// for contained levels
+		public void LogStreamError(ArrayList<String> fields){
+			MSG msg = new MSG(fields);
+			mediaStream.LogStreamError(msg.fields);
+		}
+	
+		public void LogTrace(ArrayList<String> fields){
+			MSG msg = new MSG(fields);
+			mediaStream.LogTrace(msg.fields);
+		}
+		
+		public void LogStreamError(ArrayList<String> fields, int paranoid){
+			MSG msg = new MSG(fields);
+			mediaStream.LogStreamError(msg.fields, paranoid);
+		}
+	
+		public void LogTrace(ArrayList<String> fields, int paranoid){
+			MSG msg = new MSG(fields);
+			mediaStream.LogTrace(msg.fields, paranoid);
+		}
+		
 	}
-}
+    
+
 

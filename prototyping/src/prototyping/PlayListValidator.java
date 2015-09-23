@@ -29,6 +29,6 @@ public class PlayListValidator {
 	}
 
 	public void LogRunError(String[] fields, int paranoidLevel){
-		myPlayList.mediaStream.LogRunError(fields, paranoidLevel);
+		myPlayList.mediaStream.LogTrace(fields, paranoidLevel);
 	}
 }
