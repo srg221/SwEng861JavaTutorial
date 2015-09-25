@@ -26,7 +26,7 @@ public class MediaPlayList extends PlayList {
 		super();
 		inStream = m3u8In;
 		mediaStream = inMediaStream;
-		myURL = m3u8In.mUrl.toString();
+		myURL = m3u8In.myUrl.toString();
 		masterPlayList = (MasterPlayList) master;
 		isMaster = false;
 	}
@@ -36,7 +36,7 @@ public class MediaPlayList extends PlayList {
 		super();
 		inStream = m3u8In;
 		mediaStream = inMediaStream;
-		myURL = m3u8In.mUrl.toString();
+		myURL = m3u8In.myUrl.toString();
 		// masterPlayList = null; // this media list is the root, stays null since no master
 		isMaster = false;
 	}

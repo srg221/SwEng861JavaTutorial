@@ -17,10 +17,11 @@ public class SimpleLogger {
     // use compiler supplied default constructor
     SimpleLogger() { lineNumber = 0; }
     
-    SimpleLogger(String path) throws IOException{
+    SimpleLogger(String path, char indelimiter) throws IOException{
     	lineNumber = 0;
     	OpenLog(path);
-    }
+    	delimiter = indelimiter;
+     }
     
     public void OpenLog(String path) throws IOException{
     		fileWriter = new FileWriter(path);
@@ -77,7 +78,7 @@ public class SimpleLogger {
     	String[] strFields = new String[fields.size()];
     	int i = 0;
     	for (String str : fields){
-    		strFields[i] = str;
+    		strFields[i++] = str;
     	}
     	Log(strFields);
     }

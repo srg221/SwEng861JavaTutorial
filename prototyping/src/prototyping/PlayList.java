@@ -2,7 +2,9 @@ package prototyping;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 //import java.util.Collections;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class PlayList
 	//protected String myFileName;
 	public MediaStream mediaStream;
 	public ArrayList<ExtTag> validTags = new ArrayList<ExtTag>(); 
-	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();
+	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();	
 	
 	protected PlayList(){};
 
@@ -36,6 +38,30 @@ public class PlayList
 		inStream.Download();
 	}
 
+	public String toString(){
+		if (inStream != null){
+			return inStream.GetFile().getPath();
+		}
+		else {
+			return myURL;
+		}
+	}
+	
+	public String Location() { return toString(); }
+	
+	public String Context(){
+		String context = new String("Context:");
+		context += context + Thread.currentThread().getStackTrace()[2].getFileName();
+		context += "::" + Thread.currentThread().getStackTrace()[2].getClassName();
+		context += "::" + Thread.currentThread().getStackTrace()[2].getMethodName();
+		context += "::Line:" + Thread.currentThread().getStackTrace()[2].getLineNumber();
+		return context;
+	}
+	
+	String GetTimeStamp(){
+		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+	}
+	
 	// can remove this method and entire PlayListValidator Class
 		public void Validate(MediaStream mediaStream) throws IOException{
 		PlayListValidator validator = new PlayListValidator(this);
@@ -101,7 +127,7 @@ public class PlayList
     	
     	public MSG(String... infields){
     		fields = new ArrayList<String>();
-    		fields.add(myURL);
+    		//fields.add(myURL);
     		for (String field : infields){
     			fields.add(field);
     		}
@@ -110,7 +136,7 @@ public class PlayList
 	   	// for contained
     	public MSG(ArrayList<String> infields){
 	       		fields = new ArrayList<String>();
-	    		fields.add(myURL);
+	    		//fields.add(myURL);
 	    		for (String field : infields){
 	    			fields.add(field);
 	    		}

@@ -2,7 +2,9 @@ package prototyping;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,8 @@ public class ExtTag {
 	protected int myLineNumber;
 	public String myTagName;
 	protected PlayListScanner playListScanner;
+	public int errParanoid = 0;
+	public int traceParanoid = 0;
 	protected boolean validated;
 	private static	Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { {Tokens.EXTM3U, "EXTM3U"}, 
@@ -38,6 +42,28 @@ public class ExtTag {
 	}
 	
 	public boolean IsValid() { return validated;}
+	
+	public String toString() {
+		return myTagName;
+	}
+	
+	public String Location(){
+		return (containingList.toString() + "::LINE::" + Integer.toString(myLineNumber) +
+				"::Tag::" + myTagName);
+	}
+	
+	public String Context(){
+		String context = new String("Context:");
+		context += context + Thread.currentThread().getStackTrace()[2].getFileName();
+		context += "::" + Thread.currentThread().getStackTrace()[2].getClassName();
+		context += "::" + Thread.currentThread().getStackTrace()[2].getMethodName();
+		context += "::Line:" + Thread.currentThread().getStackTrace()[2].getLineNumber();
+		return context;
+	}
+	
+	String GetTimeStamp(){
+		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+	}
 	
 	public static ExtTag Clone(PlayList playList, PlayListScanner scanner, String tagName){
 		ExtTag clone = new ExtTag(playList, scanner, tagName);
@@ -118,8 +144,8 @@ public class ExtTag {
     	
     	public MSG(String... infields){
     		fields = new ArrayList<String>();
-    		fields.add(Integer.toString(myLineNumber));
-    		fields.add(myTagName);
+    		//fields.add(Integer.toString(myLineNumber));
+    		//fields.add(myTagName);
     		for (String field : infields){
     			fields.add(field);
     		}
@@ -128,8 +154,8 @@ public class ExtTag {
 	   	// for contained
     	public MSG(ArrayList<String> infields){
 	       		fields = new ArrayList<String>();
-	    		fields.add(Integer.toString(myLineNumber));
-	    		fields.add(myTagName);
+	    		//fields.add(Integer.toString(myLineNumber));
+	    		//fields.add(myTagName);
 	    		for (String field : infields){
 	    			fields.add(field);
 	    		}

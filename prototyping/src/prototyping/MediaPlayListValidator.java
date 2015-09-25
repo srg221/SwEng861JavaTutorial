@@ -10,6 +10,7 @@ public class MediaPlayListValidator {
 	
 	MediaPlayListValidator(MediaPlayList playList) throws IOException{
 		mediaPlayList = playList;
+		if (playList.inStream.GetInputStream() != null)
 		listScanner = new PlayListScanner(playList.inStream.GetInputStream());
 	}
 	

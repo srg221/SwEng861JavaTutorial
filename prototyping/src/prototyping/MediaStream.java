@@ -3,10 +3,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import prototyping.M3u8InputStream.MSG;
 
 
 public class MediaStream {
@@ -29,12 +33,16 @@ public class MediaStream {
 		traceLogger.SetParanoidLevel(100);
 		
 		// headers 
-		MSG msg = new MSG("File Name", "Line Number", "Error Type", "Details");
+		MSG msg = new MSG("Error No.","Time", "Location", "Severity", "Type", "Details");
 		LogStreamError(msg);
-		// todo - timestamp startup 
-		//msg = new MSG("Start Time:", get the time);
-		//LogTrace(msg);
-
+		msg = new MSG(GetTimeStamp(), "", Err.Sev.INFO.toString(),"", "Analysis Started: Root URL = "+rootUrl);
+		LogStreamError(msg);
+		msg = new MSG("Trace No.","Time","Location", "Context","Details");
+		LogTrace(msg);
+		// trace timestamp creation time 
+		msg = new MSG(GetTimeStamp(),"","","Media Stream Created: Root URL = "+rootUrl );
+		LogTrace(msg, 20);
+		
 		//Initialize the validators
 		ExtTag.Initialize();  // this also calls down to leafs
 		
@@ -88,9 +96,9 @@ public class MediaStream {
 		//String LRootFileName = rootFileName.toLowerCase();
 		rootFileName = (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
 		// make complete paths, delete files if they already exist
-		String runLogPath = relativePath + rootFileName + "RunLog.csv";
+		String traceLogPath = relativePath + rootFileName + "TraceLog.csv";
 		String streamLogPath = relativePath + rootFileName + "StreamLog.csv";
-		File runLogFile = new File(runLogPath);
+		File runLogFile = new File(traceLogPath);
 		File streamLogFile = new File(streamLogPath);
 		if (runLogFile.exists()) 
 		{
@@ -103,27 +111,32 @@ public class MediaStream {
 		// non-recoverable runtime errors, can't create log files,
 		// let console know and exit
 		try {
-			streamLogger = new SimpleLogger(streamLogPath);
+			streamLogger = new SimpleLogger(streamLogPath, ',');
 		} catch (IOException e) {
 			// File Open error
 			System.out.println("Cannot create output file for stream logger:\n" + streamLogPath);
 			return false;
 		}
 		try {
-			traceLogger = new SimpleLogger(runLogPath);
+			traceLogger = new SimpleLogger(traceLogPath, ',');
 		} catch (IOException e) {
 			// File Open error
-			System.out.println("Cannot create output file for run logger:\n" + runLogPath);
+			System.out.println("Cannot create output file for run logger:\n" + traceLogPath);
 			return false;
 		}
 
 		System.out.println("Stream error log created:\n" + streamLogPath);
-		System.out.println("Run error log created:\n" + runLogPath);
+		System.out.println("Run error log created:\n" + traceLogPath);
 		// success if get this far
 		return true;
 	}
 	
 	// logging utils
+	
+	String GetTimeStamp(){
+		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+	}
+	
 	public void LogStreamError(String[] fields, int paranoidLevel){
 		streamLogger.Log(fields, paranoidLevel);
 	}

@@ -15,7 +15,7 @@ public class MasterPlayList extends PlayList {
 	}
 	
 	public MasterPlayList(M3u8InputStream m3u8In, MediaStream inMediaStream){
-		super(m3u8In.mUrl.toString(),inMediaStream);
+		super(m3u8In.myUrl.toString(),inMediaStream);
 		mediaStream = inMediaStream;
 		inStream = m3u8In;
 		isMaster = true;
