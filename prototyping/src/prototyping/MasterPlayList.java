@@ -1,9 +1,5 @@
 package prototyping;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-//import java.net.MalformedURLException;
-import java.util.ArrayList;
 
 public class MasterPlayList extends PlayList {
 	
@@ -23,22 +19,9 @@ public class MasterPlayList extends PlayList {
 	}
 	
 	public void Validate(MediaStream mediaStream){
-		// pick out EXT-X-STREAM-INF tags, create (tags?) mediaplaylists. add to mediastream list (& download urls)
+		// pick out Master playlist tags & create MediaListExtTags (& download urls)
 		MasterPlayListValidator validator;
-		try {
-			validator = new MasterPlayListValidator(this);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-	    //validator.Validate();
-		try {
-			validator.ValidateEx();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		validator = new MasterPlayListValidator(this);
+		validator.ValidateEx();
 	}
 }

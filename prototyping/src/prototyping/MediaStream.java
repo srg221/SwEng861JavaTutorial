@@ -8,9 +8,8 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import prototyping.M3u8InputStream.MSG;
+//import prototyping.M3u8InputStream.MSG;
 
 
 public class MediaStream {
@@ -22,7 +21,7 @@ public class MediaStream {
 	public String rootDirectory = null;
 	//public Handler mErrorLogHandler = null;
 	
-	MediaStream(String rootUrl, String inRootDirectory) throws NoSuchMethodException {
+	MediaStream(String rootUrl, String inRootDirectory) {
 	
 //		// set up local directory path
 //		String localPath;
@@ -47,10 +46,10 @@ public class MediaStream {
 			System.exit(-1);
 		} 
 		File relativePath = new File( (String) localPath.subSequence(0, localPath.lastIndexOf('/')) );
-
 		try{
 			relativePath.mkdirs();
 		}catch (SecurityException e){
+			// still no logs yet, so go to console
 			System.out.println("Can not create local directory path:" + relativePath.getPath());
 			System.exit(-1);
 		}
@@ -72,25 +71,33 @@ public class MediaStream {
 		LogStreamError(msg);
 		msg = new MSG(GetTimeStamp(), "", Err.Sev.INFO.toString(),"", "Analysis Started: Root URL = "+rootUrl);
 		LogStreamError(msg);
-		msg = new MSG("Trace No.","Time","Location", "Context","Details");
+		msg = new MSG("Trace No.","Time","Current Stream Item", "Context","Details");
 		LogTrace(msg);
 		// trace timestamp creation time 
 		msg = new MSG(GetTimeStamp(),"","","Media Stream Created: Root URL = "+rootUrl );
 		LogTrace(msg, 20);
-		
-		//Initialize the validators
-		ExtTag.Initialize();  // this also calls down to leafs
+				
+		//Initialize the validators - this also calls down to leafs
+		if (!ExtTag.Initialize()) {
+			// this is a coding error, stacks are dumped in ExtTag and its leaf classes
+			// post fatal internal error and exit here
+			msg = new MSG(GetTimeStamp(), "Startup" , Err.Sev.ERROR.toString(), Err.Type.INTERNAL.toString(), "Cannot continue - Exiting...");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), "Media Stream Creation", Context() , "ExtTag Validators Initialzation Fail");
+			LogTrace(msg);
+			System.exit(-1);
+		}
 		
 		// create the root playlist
 		rootPlaylist = new PlayList(rootUrl, this);	
 	}
 	
-	MediaStream(String rootUrl) throws NoSuchMethodException, SecurityException{
+	MediaStream(String rootUrl) {
 		this(rootUrl,System.getProperty("user.home"));
 	}
 	
 
-	public void Validate() throws IOException {
+	public void Validate() {
 		//validate the root
 		rootPlaylist.Validate();
 		// if rootPlayList is a master iterate through mediaPlayLists 
@@ -163,15 +170,29 @@ public class MediaStream {
 			// File Open error
 			System.out.println("Cannot create output file for run logger:\n" + traceLogPath);
 		}
-
+		// output to console since would need to find logs to see the log created messages
 		System.out.println("Stream error log created:\n" + streamLogPath);
 		System.out.println("Run error log created:\n" + traceLogPath);
+		
 		// success if get this far
 	}
 	
 	// logging utils
 	
-	String GetTimeStamp(){
+	static String Context() {
+		String context = new String("Context:");
+		context += context
+				+ Thread.currentThread().getStackTrace()[2].getFileName();
+		context += "::"
+				+ Thread.currentThread().getStackTrace()[2].getClassName();
+		context += "::"
+				+ Thread.currentThread().getStackTrace()[2].getMethodName();
+		context += "::Line:"
+				+ Thread.currentThread().getStackTrace()[2].getLineNumber();
+		return context;
+	}
+	
+	static String GetTimeStamp(){
 		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 	

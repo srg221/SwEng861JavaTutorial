@@ -39,7 +39,8 @@ public class Err {
 	    URL("URL"),
 	    FILE("FILE"),
 	    TAG("TAG"),
-	    FORMAT("FORMAT");
+	    FORMAT("FORMAT"),
+	    INTERNAL("INTERNAL:CALL SUPPORT");  //coding errors, need to exit
 
 	    
 	    private static  Map<String, Type> typeMap = new HashMap<String, Type>();

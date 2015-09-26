@@ -1,7 +1,5 @@
 package prototyping;
 
-import java.net.MalformedURLException;
-
 public class ExtTagStream extends ExtTag {
 
 	protected M3u8InputStream inStream = null;

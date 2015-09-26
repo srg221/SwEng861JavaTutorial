@@ -1,14 +1,10 @@
 package prototyping;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-//import java.util.Collections;
-import java.util.List;
 
-import prototyping.MediaStream.MSG;
+//import prototyping.MediaStream.MSG;
 
 public class PlayList 
 {
@@ -52,14 +48,14 @@ public class PlayList
 	}
 	
 	public String Location() { 
-		if (lineNum == 0){
-			try {
-				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + " lineNum == 0");
-			} catch (DebugException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		if (lineNum == 0){
+//			try {
+//				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + " lineNum == 0");
+//			} catch (DebugException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		return toString() + "::LINE::" + Integer.toString(lineNum); 
 	}
 	

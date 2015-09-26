@@ -1,12 +1,12 @@
 package prototyping;
 
-import java.io.IOException;
+
 // todo - delete this class
 public class PlayListValidator {
 	private PlayListScanner listScanner;
 	private PlayList myPlayList;
 	
-	PlayListValidator(PlayList inPlayList) throws IOException{
+	PlayListValidator(PlayList inPlayList) {
 		myPlayList = inPlayList;
 		listScanner = new PlayListScanner(myPlayList.inStream.GetInputStream());
 	}

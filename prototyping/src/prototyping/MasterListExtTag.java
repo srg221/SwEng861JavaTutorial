@@ -2,7 +2,6 @@ package prototyping;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class MasterListExtTag extends ExtTagStream {
 //	}
 	
 	// use this one to wait for validate to download
-	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName) throws MalformedURLException{
+	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
 		super(playList, scanner, tagName);
 	}
 	
@@ -28,15 +27,19 @@ public class MasterListExtTag extends ExtTagStream {
 	//	return clone;
 	//}
 	
-	public static void Initialize() {
+	public static boolean Initialize() {
 		// load my map  validator.class.getMethod()
+		boolean status = true;
 		for (String validator[] : validatorList)
 			try {
 				validatorMap.put(validator[0], MasterListExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class ));
 			} catch (NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
+				// curent logging not conducive to posting from static methods, this is a fatal coding error,
+				// will return bool to indicate success, and exit on failure
 				e.printStackTrace();
+				status = false;
 			}
+		return status;
 	}
 	
 	public static boolean HasValidator(String tagName){
@@ -47,17 +50,20 @@ public class MasterListExtTag extends ExtTagStream {
 		return (HasValidator(tagName) && (tagName == Tokens.EXT_X_STREAM_INF));
 	}
 	
-	//public static void Validate(ExtTag This, String tagName) throws Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName, PlayListScanner scanner) {	
-	//validatorMap.get(tagName).invoke(This);
+	
+	public boolean Validate(String tagName, PlayListScanner scanner) {			
+		boolean status = true;
 		if (HasValidator(tagName))
 			try {
 				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
-				// TODO Auto-generated catch block
+				// curent logging not conducive to posting from static methods, this is a fatal coding error,
+				// will return bool to indicate successful call - not necessarily a valid tag
 				e.printStackTrace();
+				status = false;
 			}
+		return status;
 	}
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)

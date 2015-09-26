@@ -6,12 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.lang.reflect.*;
-import java.util.*;
 
-import prototyping.PlayList.MSG;
+
+//import prototyping.PlayList.MSG;
 
 public class ExtTag {
 	protected PlayList containingList;
@@ -46,19 +44,19 @@ public class ExtTag {
 	}
 
 	public String Location() {
-		if (myLineNumber == 0){
-			try {
-				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + "lineNum == 0");
-			} catch (DebugException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		if (myLineNumber == 0){
+//			try {
+//				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + "lineNum == 0");
+//			} catch (DebugException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		return (containingList.toString() + "::LINE::"
 				+ Integer.toString(myLineNumber) + "::Tag::" + myTagName);
 	}
 
-	public String Context() {
+	public static String Context() {
 		String context = new String("Context:");
 		context += context
 				+ Thread.currentThread().getStackTrace()[2].getFileName();
@@ -71,7 +69,7 @@ public class ExtTag {
 		return context;
 	}
 
-	String GetTimeStamp() {
+	static String GetTimeStamp() {
 		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 
@@ -81,21 +79,27 @@ public class ExtTag {
 		return clone;
 	}
 
-	public static void Initialize() {
+	public static boolean Initialize() {
 		// load my map validator.class.getMethod()
+		boolean status = true;
 		for (String validator[] : validatorList)
 			try {
 				validatorMap.put(validator[0],
 						ExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class));
 			} catch (NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
+				// curent logging not conducive to posting from static methods, this is a fatal coding error,
+				// will return bool to indicate success, and exit on failure
 				e.printStackTrace();
+				status = false;
 			}
 		// validatorMap.put(validator[0],
 		// ExtTag.class.getMethod("EXTM3U",Class<ExtTag>,ExtTag.class));
 		// load leaf classes maps
-		MasterListExtTag.Initialize();
-		MediaListExtTag.Initialize();
+		if (status)
+		 status = MasterListExtTag.Initialize();
+		if (status)
+			status = MediaListExtTag.Initialize();
+		return status;
 	}
 
 	// utility methods
@@ -122,16 +126,20 @@ public class ExtTag {
 
 	// public static void Validate(ExtTag This, String tagName) throws
 	// Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName, PlayListScanner scanner) {
+	public boolean Validate(String tagName, PlayListScanner scanner) {
 		// validatorMap.get(tagName).invoke(This);
+		boolean status = true;
 		if (HasValidator(tagName))
 			try {
 				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
-				// TODO Auto-generated catch block
+				// curent logging not conducive to posting from static methods, this is a fatal coding error,
+				// will return bool to indicate successful call - not necessarily a valid tag
 				e.printStackTrace();
+				status = false;
 			}
+		return status;
 	}
 	
 	// private static void EXTM3U(ExtTag This)

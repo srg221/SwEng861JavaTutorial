@@ -1,8 +1,6 @@
 package prototyping;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
+
 import java.util.ArrayList;
 
 public class MediaPlayList extends PlayList {
@@ -51,22 +49,10 @@ public class MediaPlayList extends PlayList {
 	}
 
 	public void Validate(MediaStream mediaStream) {
-		// pick out #EXTINF tags, create MediaListExtTags (& download urls)
+		// pick out media list tags & create MediaListExtTags (& download urls)
 		MediaPlayListValidator validator;
-		try {
-			validator = new MediaPlayListValidator(this);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		try {
-			validator.ValidateEx();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		validator = new MediaPlayListValidator(this);
+		validator.ValidateEx();
 	}
 
 }
