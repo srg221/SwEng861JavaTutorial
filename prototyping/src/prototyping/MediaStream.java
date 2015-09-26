@@ -19,15 +19,50 @@ public class MediaStream {
 	// TODO setup logger and path in constructor
 	private SimpleLogger streamLogger = null;
 	private SimpleLogger traceLogger = null;
+	public String rootDirectory = null;
 	//public Handler mErrorLogHandler = null;
 	
-	MediaStream(String rootUrl) throws NoSuchMethodException, SecurityException {
+	MediaStream(String rootUrl, String inRootDirectory) throws NoSuchMethodException {
+	
+//		// set up local directory path
+//		String localPath;
+//		if ( inRootDirectory == null)
+//			localPath = System.getProperty("user.home");
+//		else
+//			localPath = inRootDirectory;
+//		// temp for parsing convenience only
+		// this one is for all to use as base
+		rootDirectory = new String(inRootDirectory);
+		// temps - these ones are to build path for logs and 
+		// validate root URL and local file system access check
+		String localPath = inRootDirectory;
+		URL tmpURL;
+		try {
+			tmpURL = new URL(rootUrl);
+			// create a local directory for each distinct root url
+			localPath = localPath + tmpURL.getPath();
+		} catch (MalformedURLException e) {
+			// Bad URL - need to log to console since can't make logs
+			System.out.println("Bad root URL, cannot parse:\n" + rootUrl);
+			System.exit(-1);
+		} 
+		File relativePath = new File( (String) localPath.subSequence(0, localPath.lastIndexOf('/')) );
 
-		// create logs
-		if (!CreateLoggers(rootUrl)){
-			System.out.println("Non-recoverable runtime context error - Exiting...");
+		try{
+			relativePath.mkdirs();
+		}catch (SecurityException e){
+			System.out.println("Can not create local directory path:" + relativePath.getPath());
 			System.exit(-1);
 		}
+
+		// find root file name to build log filenames
+		String rootFileName = localPath.substring(0, localPath.lastIndexOf('.'));
+		// paranoid here
+		//rootFileName.toLowerCase();
+		//rootFileName += (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
+
+		// create logs
+		CreateLoggers(rootFileName);
 		// using max paranoids unless someone sets lower
 		streamLogger.SetParanoidLevel(100);
 		traceLogger.SetParanoidLevel(100);
@@ -50,6 +85,11 @@ public class MediaStream {
 		rootPlaylist = new PlayList(rootUrl, this);	
 	}
 	
+	MediaStream(String rootUrl) throws NoSuchMethodException, SecurityException{
+		this(rootUrl,System.getProperty("user.home"));
+	}
+	
+
 	public void Validate() throws IOException {
 		//validate the root
 		rootPlaylist.Validate();
@@ -61,7 +101,8 @@ public class MediaStream {
 				if (tag.myTagName.equals(Tokens.EXT_X_STREAM_INF)){
 					ExtTagStream extTagStream = (ExtTagStream) tag;
 					MediaPlayList mediaPlayList = new MediaPlayList(extTagStream.inStream, this, rootPlaylist);
-					mediaPlayLists.add(mediaPlayList);
+					if (mediaPlayList.IsValid())
+						mediaPlayLists.add(mediaPlayList);
 				}
 			}
 			// validate the children media play lists downloading .TS 
@@ -73,31 +114,31 @@ public class MediaStream {
 		}
 	}
 
-	private boolean CreateLoggers(String rootUrl){
+	private void CreateLoggers(String rootFileName){
 
-		// set up logs - always using user directories
-		String localLogPath = System.getProperty("user.home");
-		// temp for parsing convenience only
-		URL tmpURL;
-		try {
-			tmpURL = new URL(rootUrl);
-		} catch (MalformedURLException e) {
-			// Bad URL - need to log to console since can't make logs
-			System.out.println("Bad root URL, cannot parse:\n" + rootUrl);
-			return false;
-		} 
-		// create a local directory for each distinct root url
-		String localPath = localLogPath + tmpURL.getPath();
-		File relativePath = new File( (String) localPath.subSequence(0, localPath.lastIndexOf('/')) );
-		relativePath.mkdirs();
+//		// set up logs - always using user directories
+//		//String localLogPath = System.getProperty("user.home");
+//		// temp for parsing convenience only
+//		URL tmpURL;
+//		try {
+//			tmpURL = new URL(rootUrl);
+//		} catch (MalformedURLException e) {
+//			// Bad URL - need to log to console since can't make logs
+//			System.out.println("Bad root URL, cannot parse:\n" + rootUrl);
+//			return false;
+//		} 
+//		// create a local directory for each distinct root url
+//		String localPath = localLogPath + tmpURL.getPath();
+//		File relativePath = new File( (String) localPath.subSequence(0, localPath.lastIndexOf('/')) );
+//		relativePath.mkdirs();
 		// find root file name to build log filenames
-		String rootFileName = localPath.substring(localPath.lastIndexOf('/'));
+		//String rootFileName = logDirectory.substring(localPath.lastIndexOf('/'));
 		// paranoid here
 		//String LRootFileName = rootFileName.toLowerCase();
-		rootFileName = (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
+		//rootFileName = (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
 		// make complete paths, delete files if they already exist
-		String traceLogPath = relativePath + rootFileName + "TraceLog.csv";
-		String streamLogPath = relativePath + rootFileName + "StreamLog.csv";
+		String traceLogPath = rootFileName + "TraceLog.csv";
+		String streamLogPath = rootFileName + "StreamLog.csv";
 		File runLogFile = new File(traceLogPath);
 		File streamLogFile = new File(streamLogPath);
 		if (runLogFile.exists()) 
@@ -115,20 +156,17 @@ public class MediaStream {
 		} catch (IOException e) {
 			// File Open error
 			System.out.println("Cannot create output file for stream logger:\n" + streamLogPath);
-			return false;
 		}
 		try {
 			traceLogger = new SimpleLogger(traceLogPath, ',');
 		} catch (IOException e) {
 			// File Open error
 			System.out.println("Cannot create output file for run logger:\n" + traceLogPath);
-			return false;
 		}
 
 		System.out.println("Stream error log created:\n" + streamLogPath);
 		System.out.println("Run error log created:\n" + traceLogPath);
 		// success if get this far
-		return true;
 	}
 	
 	// logging utils

@@ -34,14 +34,15 @@ public class MediaListExtTag extends ExtTagStream {
 	// return clone;
 	// }
 
-	public static void Initialize() throws NoSuchMethodException,
-			SecurityException {
+	public static void Initialize() {
 		// load my map validator.class.getMethod()
 		for (String validator[] : validatorList)
-			// validatorMap.put(validator[0],
-			// ExtTag.class.getMethod(validator[1]));
-			validatorMap.put(validator[0],
-					MediaListExtTag.class.getDeclaredMethod(validator[1]));
+			try {
+				validatorMap.put(validator[0], MediaListExtTag.class.getDeclaredMethod(validator[1]));
+			} catch (NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		// validatorMap.put(validator[0],
 		// ExtTag.class.getMethod("EXTM3U",Class<ExtTag>,ExtTag.class));
 	}
@@ -56,11 +57,17 @@ public class MediaListExtTag extends ExtTagStream {
 
 	// public static void Validate(ExtTag This, String tagName) throws
 	// Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName) throws Exception,
-			IllegalArgumentException, InvocationTargetException {
+	public void Validate(String tagName) {
 		// validatorMap.get(tagName).invoke(This);
 		if (HasValidator(tagName))
-			validatorMap.get(tagName).invoke(this, (Object[]) null);
+			try {
+				validatorMap.get(tagName).invoke(this, (Object[]) null);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				e.getMessage();
+			}
 	}
 
 	// private static void EXTINF(ExtTag This)
@@ -84,7 +91,10 @@ public class MediaListExtTag extends ExtTagStream {
 		// String[] msg = {"Error Number", "Error Type", "File Name",
 		// "Line Number", "Details"};
 		// LogRunError(msg, 20);
-		validated = true;
+		if (validated){
+			// validate ts file...
+		}
+
 	}
 
 	private void EXT_X_MEDIA_SEQUENCE() {

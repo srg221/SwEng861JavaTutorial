@@ -17,26 +17,29 @@ public class PlayList
 	protected String myURL;
 	//protected String myFileName;
 	public MediaStream mediaStream;
-	public ArrayList<ExtTag> validTags = new ArrayList<ExtTag>(); 
-	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();	
+	public ArrayList<ExtTag> validTags = new ArrayList<ExtTag>();
+	private boolean validated = true; // assume success
+	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();
+	
 	
 	protected PlayList(){};
 
 	// this constructor only called for root when we don't know if it is a master
 	// or media yet
 	public PlayList(String url, MediaStream inMediaStream) {
-		try {
-			myURL = url;
-			mediaStream = inMediaStream;
-			inStream = new M3u8InputStream(url, this);
-		} catch (MalformedURLException e) {
-			// this exception unlikely since url was validiated in media stream
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// need to catch I/O exception here, cannot connect to root playlist URL
-		inStream.Download();
+		myURL = url;
+		mediaStream = inMediaStream;
+		inStream = new M3u8InputStream(url, this);
+		// only attempt to download if inStream is valid after creation
+		if (inStream.IsValid())
+			inStream.Download();
+		// set this tag's validation status equal to result of download
+		validated = inStream.IsValid();
 	}
+	
+	// anyone can mark bad
+	public void MarkBad() { validated = false; }
+	public boolean IsValid() { return validated; }
 
 	public String toString(){
 		if (inStream != null){

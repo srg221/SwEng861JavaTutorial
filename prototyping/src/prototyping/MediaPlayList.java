@@ -9,6 +9,7 @@ public class MediaPlayList extends PlayList {
 
 	public MasterPlayList masterPlayList = null; //referring list, or if this is root remains null
 	public ArrayList<ExtTagStream> validMediaStreams = new ArrayList<ExtTagStream>();
+	
 	public MediaPlayList(String url, MediaStream inMediaStream, PlayList master) {
 		super(url, inMediaStream);
 		masterPlayList = (MasterPlayList) master;
@@ -21,7 +22,7 @@ public class MediaPlayList extends PlayList {
 		isMaster = false;
 	}
 	
-	// media stream already resolved - 
+	// media stream already resolved/created for these 
 	public MediaPlayList(M3u8InputStream m3u8In, MediaStream inMediaStream, PlayList master){
 		super();
 		inStream = m3u8In;
@@ -31,7 +32,6 @@ public class MediaPlayList extends PlayList {
 		isMaster = false;
 	}
 	
-
 	public MediaPlayList(M3u8InputStream m3u8In, MediaStream inMediaStream){
 		super();
 		inStream = m3u8In;

@@ -2,6 +2,7 @@ package prototyping;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,97 +12,106 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
+//import java.util.Base64;
 //import java.util.logging.Handler;
 //import java.util.logging.Logger;
 
 import java.util.Date;
 
-import prototyping.ExtTag.MSG;
-
 public class M3u8InputStream {
 
 	public URL myUrl = null;
 	public String myStrUrl = null;
+	private boolean validated = true; //assume success
 	private InputStream myInputStream = null;
 	private File myLocalFile = null;
 	private String myLocalRootPath = "";
 	private PlayList myPlayList;
 	private ExtTag myTag = null;
 
-	// private boolean isRoot = false;
 
-	public M3u8InputStream(String url, String localRootPath,
-			PlayList containingList) throws MalformedURLException {
+	// this one belongs to a playlist
+	public M3u8InputStream(String url, PlayList containingList){
 		myPlayList = containingList;
 		myStrUrl = new String(url);
-		myUrl = new URL(url);
-		myLocalRootPath = localRootPath;
-		// isRoot = true;
-	}
-
-	public M3u8InputStream(String url, PlayList containingList)
-			throws MalformedURLException {
-		myPlayList = containingList;
-		myStrUrl = new String(url);
-		myUrl = new URL(url);
-		myLocalRootPath = System.getProperty("user.home");
-	}
-
-	public M3u8InputStream(String url, String localRootPath,
-			PlayList containingList, ExtTag containingTag)
-			throws MalformedURLException {
-		myPlayList = containingList;
-		myTag = containingTag;
-		myStrUrl = new String(url);
-		myUrl = new URL(url);
-		myLocalRootPath = localRootPath;
-		// isRoot = true;
-	}
-
-	public M3u8InputStream(String url, PlayList containingList,
-			ExtTag containingTag) throws MalformedURLException {
-		myPlayList = containingList;
-		myTag = containingTag;
-		myStrUrl = new String(url);
-		myUrl = new URL(url);
-		myLocalRootPath = System.getProperty("user.home");
-	}
-
-	public void Download() {
-		// if need to set connection attribites, say pswd
-		java.net.URLConnection conn;
+		//myLocalRootPath = System.getProperty("user.home");
+		myLocalRootPath = new String(myPlayList.mediaStream.rootDirectory);
 		try {
-			conn = myUrl.openConnection();
+			myUrl = new URL(url);
+		} catch (MalformedURLException e) {
+			validated = false;
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed Playlist URL "+myStrUrl);
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context(), "Malformed Playlist URL "+myStrUrl);
+			LogTrace(msg, 20);
+		}
+	}
 
-			// hardcoded (for class only, if not in url)
+
+	// this one belongs to an ExtTagStream
+	public M3u8InputStream(String url, ExtTag containingTag) {
+		myPlayList = containingTag.containingList;
+		myTag = containingTag;
+		myStrUrl = new String(url);
+		//myLocalRootPath = System.getProperty("user.home");
+		myLocalRootPath = new String(myPlayList.mediaStream.rootDirectory);	
+		try {
+			myUrl = new URL(url);
+		} catch (MalformedURLException e) {
+			validated = false;
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed stream.ts URL "+myStrUrl);
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context(), "Malformed stream.ts URL "+myStrUrl);
+			LogTrace(msg, 20);
+		}
+	}
+
+	// anyone can mark bad
+	public void MarkBad() { validated = false; }
+	public boolean IsValid() { return validated; }
+	
+	public void Download() {
+		// if need to set connection attributes, say pswd
+		java.net.URLConnection conn;
+			try {
+				conn = myUrl.openConnection();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
+
+			// hard coded authentication test (for class only, if not in url)
 			// String username = "tomcat";
 			// String pswd = "Apac-Hee";
 			// String userpass = username + ":" + pswd;
 			// check if in url
+			// Simple user & password authentication
 			if (myUrl.getUserInfo() != null) {
 				// need to import org.apache.commons.codec.binary.Base64 to use
 				// String basicAuth = "Basic " + new String(new
 				// Base64().encode(url.getUserInfo().getBytes()));
+				// So do something more explicit
 				String basicAuth = "Basic "
 						+ javax.xml.bind.DatatypeConverter
 								.printBase64Binary(myUrl.getUserInfo()
 										.getBytes());
 				conn.setRequestProperty("Authorization", basicAuth);
 			}
-			// this gives a Base64 constructor error
-			// String basicAuth = "Basic " + new
-			// String(Base64.encodeBase64(userpass.getBytes()));
-			// alternate Base64 encode
-			// String basicAuth = "Basic " +
-			// javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-			// conn.setRequestProperty ("Authorization", basicAuth);
-			// conn.addRequestProperty("User-Agent",
-			// "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613  Firefox/6.0a2");
-			InputStream connInStream = conn.getInputStream();
-			ReadableByteChannel rbc = Channels.newChannel(connInStream);
 
-			// else just this if don't need to set/add request properties
+			InputStream connInStream;
+			try {
+				connInStream = conn.getInputStream();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
+			ReadableByteChannel rbc = Channels.newChannel(connInStream);
+			// if don't need to set/add request properties can skip all of
+			// the above and just do
 			// ReadableByteChannel rbc = Channels.newChannel(mUrl.openStream());
 
 			// set up local storage and create file
@@ -113,39 +123,78 @@ public class M3u8InputStream {
 			if (myLocalFile.exists()) {
 				myLocalFile.delete();
 			}
-			myLocalFile.createNewFile();
+			try {
+				myLocalFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
 
-			// stream out
-			FileOutputStream fos = new FileOutputStream(myLocalFile);
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-			fos.close();
+			// make out stream and stream out
+			FileOutputStream fos;
+			try {
+				fos = new FileOutputStream(myLocalFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
+			try {
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
+			try {
+				fos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				validated = false;
+				return;
+			}
 			// testing
 			MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " success");
 			LogTrace(msg, 20);
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.INFO.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " success");
 			LogStreamError(msg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " failed");
-			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " failed");
-			LogTrace(msg, 20);
-		}
+
+//			// TODO Auto-generated catch block
+//			// e.printStackTrace();
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " failed");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " failed");
+//			LogTrace(msg, 20);
+		
 	}
 
 	public File GetFile() {
 		return myLocalFile;
 	}
 
-	public InputStream GetInputStream() throws IOException {
+	public InputStream GetInputStream() {
 		if (myUrl == null || myLocalFile == null) {
 			return null;
 		}
 		if (myInputStream != null) {
-			myInputStream.close();
+			try {
+				myInputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		myInputStream = (InputStream) new FileInputStream(myLocalFile);
+		try {
+			myInputStream = (InputStream) new FileInputStream(myLocalFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return myInputStream;
 	}
 

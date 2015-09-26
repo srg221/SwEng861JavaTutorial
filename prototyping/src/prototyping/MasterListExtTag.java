@@ -28,12 +28,15 @@ public class MasterListExtTag extends ExtTagStream {
 	//	return clone;
 	//}
 	
-	public static void Initialize() throws NoSuchMethodException, SecurityException{
+	public static void Initialize() {
 		// load my map  validator.class.getMethod()
 		for (String validator[] : validatorList)
-		     //validatorMap.put(validator[0], ExtTag.class.getMethod(validator[1]));
-			validatorMap.put(validator[0], MasterListExtTag.class.getDeclaredMethod(validator[1]));
-		//validatorMap.put(validator[0], ExtTag.class.getMethod("EXTM3U",Class<ExtTag>,ExtTag.class));
+			try {
+				validatorMap.put(validator[0], MasterListExtTag.class.getDeclaredMethod(validator[1]));
+			} catch (NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 	public static boolean HasValidator(String tagName){
@@ -45,10 +48,16 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	//public static void Validate(ExtTag This, String tagName) throws Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName) throws Exception, IllegalArgumentException, InvocationTargetException{	
+	public void Validate(String tagName) {	
 	//validatorMap.get(tagName).invoke(This);
 		if (HasValidator(tagName))
-			 validatorMap.get(tagName).invoke(this, (Object[])null);
+			try {
+				validatorMap.get(tagName).invoke(this, (Object[])null);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)

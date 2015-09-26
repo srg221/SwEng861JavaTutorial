@@ -96,9 +96,25 @@ public class MediaPlayListValidator {
 				continue;
 			}
 			// log message runtime error	
+	}
+
+	// pick out streams
+	for (ExtTag tag : mediaPlayList.validTags){
+	if (tag.myTagName.equals(Tokens.EXTINF)){
+		if (tag.IsValid())
+			mediaPlayList.validMediaStreams.add((ExtTagStream) tag);
 		}
+	}
+	// validate .ts files, like est duration
+	ValidateStreams();
+	}
+	
+	public void ValidateStreams(){
+		// go through mediaPlayList.validMediaStreams
 		
 	}
-}
+	
+	
+} // end class
 
 

@@ -14,6 +14,7 @@ public class MasterPlayList extends PlayList {
 		isMaster = true;
 	}
 	
+	// inStream already resolved/created
 	public MasterPlayList(M3u8InputStream m3u8In, MediaStream inMediaStream){
 		super(m3u8In.myUrl.toString(),inMediaStream);
 		mediaStream = inMediaStream;
