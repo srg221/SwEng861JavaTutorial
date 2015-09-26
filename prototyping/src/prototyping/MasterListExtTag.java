@@ -13,9 +13,9 @@ public class MasterListExtTag extends ExtTagStream {
 												{Tokens.EXT_X_MEDIA, "EXT_X_MEDIA"},
 											   };
 	
-	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName, String url) throws MalformedURLException{
-		super(playList, scanner, tagName, url);
-	}
+//	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName, String url) throws MalformedURLException{
+//		super(playList, scanner, tagName, url);
+//	}
 	
 	// use this one to wait for validate to download
 	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName) throws MalformedURLException{
@@ -32,7 +32,7 @@ public class MasterListExtTag extends ExtTagStream {
 		// load my map  validator.class.getMethod()
 		for (String validator[] : validatorList)
 			try {
-				validatorMap.put(validator[0], MasterListExtTag.class.getDeclaredMethod(validator[1]));
+				validatorMap.put(validator[0], MasterListExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class ));
 			} catch (NoSuchMethodException | SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -48,11 +48,11 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	//public static void Validate(ExtTag This, String tagName) throws Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName) {	
+	public void Validate(String tagName, PlayListScanner scanner) {	
 	//validatorMap.get(tagName).invoke(This);
 		if (HasValidator(tagName))
 			try {
-				validatorMap.get(tagName).invoke(this, (Object[])null);
+				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				// TODO Auto-generated catch block
@@ -61,30 +61,48 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
-	private void EXT_X_STREAM_INF(){
+	private void EXT_X_STREAM_INF(PlayListScanner scanner){
 		if (!containingList.IsMaster()){
-			
 			validated = false;
 			return;
 		}
 		// need to download
-		//boolean success = false;
-		if (playListScanner.scanner.hasNext()){
-			String urlLine = playListScanner.GetNextLine();
-			if (true) // is not a tag, i.e. a missing line
-			GetStream(urlLine);
-			else;
-				// log missing url (vs malformed)
+		while (scanner.scanner.hasNext()){
+			String urlLine = scanner.GetNextLine();
+			// skip comments and blank lines
+			if (scanner.IsBlanksOrComment(urlLine)) continue;
+			if (!urlLine.startsWith(Tokens.tagBegin)){ 
+				// is not a tag, comment, take it as the URL
+				GetStream(urlLine);  // will mark bad if any problem getting stream
+				break; // done in this loop, need to validate remaining line
+			}
+			else {
+				// next line is a tag - log missing url (vs malformed)
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for MediaPlayList");
+				LogStreamError(msg);
+				// rewind to line just before tag
+				int curLine = scanner.currLineNum;
+				scanner.GoTo(curLine-1);
+				// set bad tag and quit
+				validated = false;
+				return;
+			}
+		} 
+		// did we hit EOF before found URL?
+		if (!scanner.scanner.hasNext())
+		{
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
+			LogStreamError(msg);
+			validated = false;
+			return;
 		}
-		else {
-			// log error end of file
-			// leave validated = false;
+		// if still validated check rest of the tag line (myLine)
+		if (validated){
+			// 
 		}
-		
-		validated = true;
 	}
 	
-	private void EXT_X_MEDIA(){
+	private void EXT_X_MEDIA(PlayListScanner scanner){
 		validated = true;
 	}
 	

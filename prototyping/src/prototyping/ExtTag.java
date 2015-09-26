@@ -19,22 +19,24 @@ public class ExtTag {
 	protected String myLine;
 	protected int myLineNumber;
 	public String myTagName;
-	protected PlayListScanner playListScanner;
+	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
-			{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" } };
+												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" } 
+											  };
 
 	ExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
 		// parent reference
 		containingList = playList;
-		playListScanner = scanner;
-		myLineNumber = playListScanner.currLineNum;
-		myLine = playListScanner.currLine;
+		//playListScanner = scanner;
+		myLineNumber = scanner.currLineNum;
+		myLine = scanner.currLine;
 		containingListName = containingList.myURL;
 		myTagName = tagName;
 	}
 
+	
 	// anyone can mark bad
 	public void MarkBad() { validated = false; }
 	public boolean IsValid() { return validated; }
@@ -44,6 +46,14 @@ public class ExtTag {
 	}
 
 	public String Location() {
+		if (myLineNumber == 0){
+			try {
+				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + "lineNum == 0");
+			} catch (DebugException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return (containingList.toString() + "::LINE::"
 				+ Integer.toString(myLineNumber) + "::Tag::" + myTagName);
 	}
@@ -76,7 +86,7 @@ public class ExtTag {
 		for (String validator[] : validatorList)
 			try {
 				validatorMap.put(validator[0],
-						ExtTag.class.getDeclaredMethod(validator[1]));
+						ExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class));
 			} catch (NoSuchMethodException | SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -112,25 +122,25 @@ public class ExtTag {
 
 	// public static void Validate(ExtTag This, String tagName) throws
 	// Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName) {
+	public void Validate(String tagName, PlayListScanner scanner) {
 		// validatorMap.get(tagName).invoke(This);
 		if (HasValidator(tagName))
 			try {
-				validatorMap.get(tagName).invoke(this, (Object[]) null);
+				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}
-
+	
 	// private static void EXTM3U(ExtTag This)
-	private void EXTM3U() {
+	private void EXTM3U(PlayListScanner scanner) {
 		validated = true;
 	}
 
 	// private static void EXT_X_VERSION(ExtTag This)
-	private void EXT_X_VERSION() {
+	private void EXT_X_VERSION(PlayListScanner scanner) {
 
 		validated = true;
 	}
@@ -214,5 +224,6 @@ public class ExtTag {
 		MSG msg = new MSG(fields);
 		containingList.LogTrace(msg.fields, paranoid);
 	}
+
 
 }

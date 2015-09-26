@@ -14,35 +14,31 @@ public class MediaPlayListValidator {
 		listScanner = new PlayListScanner(playList.inStream.GetInputStream());
 	}
 	
-	public void Validate() throws IllegalArgumentException, InvocationTargetException, Exception{
-		
-		while (listScanner.scanner.hasNext()) {
-			String line = listScanner.scanner.next();
-            if ( line.startsWith("#" + Tokens.EXTINF)){
-            	line = listScanner.scanner.next();
-            	// line here is URL, so may need not to pass
-            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, Tokens.EXTINF, line);
-            	//tag.inStream.Download();  //already done as part of inStream creation
-            	// testing
-            	if (ExtTag.HasValidator(Tokens.EXTM3U)){
-            		ExtTag TestTag =  new ExtTag( mediaPlayList, listScanner, Tokens.EXTM3U);
-            		TestTag.Validate(Tokens.EXTM3U);
-            	}
-            	mediaPlayList.validTags.add(tag);
-            }
-		}
-	}
+//	public void Validate() throws IllegalArgumentException, InvocationTargetException, Exception{
+//		
+//		while (listScanner.scanner.hasNext()) {
+//			String line = listScanner.scanner.next();
+//            if ( line.startsWith("#" + Tokens.EXTINF)){
+//            	line = listScanner.scanner.next();
+//            	// line here is URL, so may need not to pass
+//            	MediaListExtTag tag = new MediaListExtTag(mediaPlayList,listScanner, Tokens.EXTINF, line);
+//            	//tag.inStream.Download();  //already done as part of inStream creation
+//            	// testing
+//            	if (ExtTag.HasValidator(Tokens.EXTM3U)){
+//            		ExtTag TestTag =  new ExtTag( mediaPlayList, listScanner, Tokens.EXTM3U);
+//            		TestTag.Validate(Tokens.EXTM3U, listScanner);
+//            	}
+//            	mediaPlayList.validTags.add(tag);
+//            }
+//		}
+//	}
 	
 	public void ValidateEx() throws IllegalArgumentException, InvocationTargetException, Exception{
 		
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.GetNextLine();
-			// line formatting checks
-			// check if comment
-			if (line.startsWith(Tokens.beginLine) && !line.startsWith(Tokens.tagBegin))
-				continue; // well formed comment
-			// completely blank lines allowed
-			if (line.length() == 0)
+			// skip well formed comments and completely blank lines
+			if (listScanner.IsBlanksOrComment(line))
 				continue;
 			// At this point needs to be a tag, will never be in this context if on a URL
 			if (!line.startsWith(Tokens.tagBegin)){
@@ -60,7 +56,7 @@ public class MediaPlayListValidator {
 			String candidateTag = ExtTag.GetCandidateTag(line);
 			if (ExtTag.HasValidator(candidateTag)){
 				ExtTag extTag =  new ExtTag(mediaPlayList, listScanner, candidateTag);
-				extTag.Validate(candidateTag);
+				extTag.Validate(candidateTag, listScanner);
 				if (extTag.IsValid()){
 					mediaPlayList.validTags.add(extTag);
 				}
@@ -71,7 +67,7 @@ public class MediaPlayListValidator {
 			}
 			if (MediaListExtTag.HasValidator(candidateTag)){
 				MediaListExtTag extTag =  new MediaListExtTag(mediaPlayList, listScanner, candidateTag);
-				extTag.Validate(candidateTag);
+				extTag.Validate(candidateTag, listScanner);
 				if (extTag.IsValid()){
 					mediaPlayList.validTags.add(extTag);
 				}
@@ -84,7 +80,7 @@ public class MediaPlayListValidator {
 			// anything with a stream should not download it, should it advance scanner?
 			if (MasterListExtTag.HasValidator(candidateTag)){
 				MasterListExtTag extTag =  new MasterListExtTag(mediaPlayList, listScanner, candidateTag);
-				extTag.Validate(candidateTag);
+				extTag.Validate(candidateTag, listScanner);
 				if (extTag.IsValid()){
 					assert(false);
 					// log runtime error

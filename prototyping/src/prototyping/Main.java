@@ -15,11 +15,12 @@ public class Main {
 				String url = bufferRead.readLine();
 				if (url.isEmpty()) 
 				{
-					url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
+					//url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
 					//url = "ftp://tomcat:Apac-Hee@146.186.90.203/Arris/ipad.m3u8";
 					//url = "http://tomcat:Apac-Hee@146.186.90.203:8080/Arris/ipad.m3u8";
 					//url = "http://146.186.90.203:8080/Arris/ipad.m3u8";
-					//url = "http://localhost/Arris/ipad.m3u8";					
+					//url = "http://localhost/Arris/ipad.m3u8";	
+					url = "http://127.0.0.1/Arris/ipad.m3u8";
 				}
 /*
 				//test = new M3u8InputStream(url, "C:\\temp");

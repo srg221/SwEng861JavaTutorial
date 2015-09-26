@@ -59,9 +59,9 @@ public class M3u8InputStream {
 			myUrl = new URL(url);
 		} catch (MalformedURLException e) {
 			validated = false;
-			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed stream.ts URL "+myStrUrl);
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed URL "+myStrUrl+ " Exception:"+e.getCause());
 			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context(), "Malformed stream.ts URL "+myStrUrl);
+			msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 			LogTrace(msg, 20);
 		}
 	}
@@ -75,9 +75,15 @@ public class M3u8InputStream {
 		java.net.URLConnection conn;
 			try {
 				conn = myUrl.openConnection();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Open conn to "+myStrUrl+" success");
+				LogTrace(msg, 40);				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);				
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Cannot open connection to " +myStrUrl+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
 				validated = false;
 				return;
 			}
@@ -103,9 +109,15 @@ public class M3u8InputStream {
 			InputStream connInStream;
 			try {
 				connInStream = conn.getInputStream();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Get input stream " +myStrUrl+ " success.");
+				LogTrace(msg, 40);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Opening connection to " +myStrUrl+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);
+				//e.printStackTrace();
 				validated = false;
 				return;
 			}
@@ -125,10 +137,16 @@ public class M3u8InputStream {
 			}
 			try {
 				myLocalFile.createNewFile();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Creating file "+myLocalFile.getPath()+" success");
+				LogTrace(msg, 40);				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);				
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Create file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
 				validated = false;
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
 				return;
 			}
 
@@ -136,33 +154,60 @@ public class M3u8InputStream {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(myLocalFile);
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Open file out stream "+myLocalFile.getPath()+" success");
+				LogTrace(msg, 40);		
 			} catch (FileNotFoundException e) {
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);				
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// e.printStackTrace();
 				validated = false;
 				return;
 			}
 			try {
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Transfer from " +myStrUrl+ " success.");
+				LogTrace(msg, 40);
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Download " +myStrUrl+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);
 				validated = false;
 				return;
-			}
+				} finally {
+					try {
+					fos.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					}
+				}
+
 			try {
 				fos.close();
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Closing file out stream "+myLocalFile.getPath()+" success");
+				LogTrace(msg, 40);		
 			} catch (IOException e) {
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);				
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				validated = false;
 				return;
 			}
 			// testing
-			MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " success");
-			LogTrace(msg, 20);
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.INFO.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " success");
-			LogStreamError(msg);
+			//MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " success");
+			//LogTrace(msg, 20);
+			//msg = new MSG(GetTimeStamp(), Location(), Err.Sev.INFO.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " success");
+			//LogStreamError(msg);
 
 //			// TODO Auto-generated catch block
 //			// e.printStackTrace();
@@ -185,15 +230,25 @@ public class M3u8InputStream {
 			try {
 				myInputStream.close();
 			} catch (IOException e) {
+				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+				LogTrace(msg, 20);				
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				LogStreamError(msg);
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				validated = false;
 			}
 		}
 		try {
 			myInputStream = (InputStream) new FileInputStream(myLocalFile);
 		} catch (FileNotFoundException e) {
+			MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
+			LogTrace(msg, 20);				
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+			LogStreamError(msg);
+			validated = false;
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return myInputStream;
 	}

@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import prototyping.ExtTag.MSG;
+
 public class MediaListExtTag extends ExtTagStream {
 
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
@@ -16,10 +18,11 @@ public class MediaListExtTag extends ExtTagStream {
 			{ Tokens.EXT_X_START, "EXT_X_START" },
 			{ Tokens.EXT_X_PLAYLIST_TYPE, "EXT_X_PLAYLIST_TYPE" } };
 
-	MediaListExtTag(PlayList playList, PlayListScanner scanner, String tagName,
-			String url) throws MalformedURLException {
-		super(playList, scanner, tagName, url);
-	}
+	// MediaListExtTag(PlayList playList, PlayListScanner scanner, String
+	// tagName,
+	// String url) throws MalformedURLException {
+	// super(playList, scanner, tagName, url);
+	// }
 
 	// this one waits for validate to download
 	MediaListExtTag(PlayList playList, PlayListScanner scanner, String tagName)
@@ -38,7 +41,7 @@ public class MediaListExtTag extends ExtTagStream {
 		// load my map validator.class.getMethod()
 		for (String validator[] : validatorList)
 			try {
-				validatorMap.put(validator[0], MediaListExtTag.class.getDeclaredMethod(validator[1]));
+				validatorMap.put(validator[0], MediaListExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class));
 			} catch (NoSuchMethodException | SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -57,11 +60,11 @@ public class MediaListExtTag extends ExtTagStream {
 
 	// public static void Validate(ExtTag This, String tagName) throws
 	// Exception, IllegalArgumentException, InvocationTargetException{
-	public void Validate(String tagName) {
+	public void Validate(String tagName, PlayListScanner scanner) {
 		// validatorMap.get(tagName).invoke(This);
 		if (HasValidator(tagName))
 			try {
-				validatorMap.get(tagName).invoke(this, (Object[]) null);
+				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				// TODO Auto-generated catch block
@@ -71,53 +74,65 @@ public class MediaListExtTag extends ExtTagStream {
 	}
 
 	// private static void EXTINF(ExtTag This)
-	private void EXTINF() {
+	private void EXTINF(PlayListScanner scanner) {
 		// need to download
-		//boolean success = false;
-		if (playListScanner.scanner.hasNext()) {
-			String urlLine = playListScanner.GetNextLine();
-			if (true) // is not a tag, i.e. a missing line
-				GetStream(urlLine);
-			else
-				;
-			// log missing url (vs malformed)
-		} else {
-			// log error end of file
-			String[] msg = { "Error Number", "Error Type", "File Name",
-					"Line Number", "Details" };
-			//LogRunError(msg, 20);
-			// leave validated = false;
+		while (scanner.scanner.hasNext()){
+			String urlLine = scanner.GetNextLine();
+			// skip comments and blank lines
+			if (scanner.IsBlanksOrComment(urlLine)) continue;
+			if (!urlLine.startsWith(Tokens.tagBegin)){ 
+				// is not a tag, comment, take it as the URL
+				GetStream(urlLine);  // will mark bad if any problem getting stream
+				break; // done in this loop, need to validate remaining line
+			}
+			else {
+				// next line is a tag - log missing url (vs malformed)
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for media (.ts)");
+				LogStreamError(msg);
+				// rewind to line just before tag
+				int curLine = scanner.currLineNum;
+				scanner.GoTo(curLine-1);
+				// set bad tag and quit
+				validated = false;
+				return;
+			}
+		} 
+		// did we hit EOF before found URL?
+		if (!scanner.scanner.hasNext())
+		{
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
+			LogStreamError(msg);
+			validated = false;
+			return;
 		}
-		// String[] msg = {"Error Number", "Error Type", "File Name",
-		// "Line Number", "Details"};
-		// LogRunError(msg, 20);
+		// if still validated check rest of the tag line (myLine), and .ts file characteristics
 		if (validated){
-			// validate ts file...
+			// 
 		}
 
 	}
 
-	private void EXT_X_MEDIA_SEQUENCE() {
+	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
 
 		validated = true;
 	}
 
-	private void EXT_X_ENDLIST() {
+	private void EXT_X_ENDLIST(PlayListScanner scanner) {
 
 		validated = true;
 	}
 
-	private void EXT_X_TARGETDURATION() {
+	private void EXT_X_TARGETDURATION(PlayListScanner scanner) {
 
 		validated = true;
 	}
 
-	private void EXT_X_START() {
+	private void EXT_X_START(PlayListScanner scanner) {
 
 		validated = true;
 	}
 
-	private void EXT_X_PLAYLIST_TYPE() {
+	private void EXT_X_PLAYLIST_TYPE(PlayListScanner scanner) {
 
 		validated = true;
 	}

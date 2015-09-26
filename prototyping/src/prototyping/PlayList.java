@@ -20,6 +20,7 @@ public class PlayList
 	public ArrayList<ExtTag> validTags = new ArrayList<ExtTag>();
 	private boolean validated = true; // assume success
 	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();
+	protected int lineNum = 0;  //containing list line number, remains zero if top level
 	
 	
 	protected PlayList(){};
@@ -42,7 +43,7 @@ public class PlayList
 	public boolean IsValid() { return validated; }
 
 	public String toString(){
-		if (inStream != null){
+		if (inStream != null && inStream.GetFile() != null ){
 			return inStream.GetFile().getPath();
 		}
 		else {
@@ -50,7 +51,17 @@ public class PlayList
 		}
 	}
 	
-	public String Location() { return toString(); }
+	public String Location() { 
+		if (lineNum == 0){
+			try {
+				throw new DebugException(Thread.currentThread().getStackTrace()[1].getClassName() + " lineNum == 0");
+			} catch (DebugException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return toString() + "::LINE::" + Integer.toString(lineNum); 
+	}
 	
 	public String Context(){
 		String context = new String("Context:");
@@ -65,20 +76,23 @@ public class PlayList
 		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 	
-	// can remove this method and entire PlayListValidator Class
-		public void Validate(MediaStream mediaStream) throws IOException{
-		PlayListValidator validator = new PlayListValidator(this);
-		if (validator.IsMaster()){
-			mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
-		}
-		else{
-			mediaStream.rootPlaylist = new MediaPlayList(inStream, mediaStream);
-		}
-		
-		mediaStream.rootPlaylist.Validate(mediaStream);
-	}
+//	// can remove this method and entire PlayListValidator Class
+//		public void Validate(MediaStream mediaStream) throws IOException{
+//		PlayListValidator validator = new PlayListValidator(this);
+//		if (validator.IsMaster()){
+//			mediaStream.rootPlaylist = new MasterPlayList(inStream, mediaStream);
+//		}
+//		else{
+//			mediaStream.rootPlaylist = new MediaPlayList(inStream, mediaStream);
+//		}
+//		
+//		mediaStream.rootPlaylist.Validate(mediaStream);
+//	}
 	
-	public void Validate() throws IOException{
+	// this is meant to be overridden, not an abstract class so can't make abstract...
+	public void Validate(MediaStream mediaStream){};
+	
+	public void Validate() {
 		PlayListScanner listScanner =  new PlayListScanner(inStream.GetInputStream());
 		//private PlayList myPlayList;
 	    boolean isMaster = false;

@@ -100,7 +100,7 @@ public class MediaStream {
 				// build media playlists
 				if (tag.myTagName.equals(Tokens.EXT_X_STREAM_INF)){
 					ExtTagStream extTagStream = (ExtTagStream) tag;
-					MediaPlayList mediaPlayList = new MediaPlayList(extTagStream.inStream, this, rootPlaylist);
+					MediaPlayList mediaPlayList = new MediaPlayList(extTagStream.inStream, this, rootPlaylist );
 					if (mediaPlayList.IsValid())
 						mediaPlayLists.add(mediaPlayList);
 				}
