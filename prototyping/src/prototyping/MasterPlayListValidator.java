@@ -40,9 +40,9 @@ public class MasterPlayListValidator {
 			// special handling for line 1 since it needs to be a EXTM3U tag
 			// can't do further down since only want to complain once...
 			if (listScanner.currLineNum == 1 && !Tokens.EXTM3Upattern.matcher(listScanner.currLine).matches()  ){
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "List does not start with EXTM3U Tag");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "List does not start with EXTM3U Tag");
 				LogStreamError(msg);
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "List does not start with EXTM3U Tag");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "List does not start with EXTM3U Tag");
 				LogTrace(msg, 20);
 			}
 			// skip well formed comments and completely blank lines
@@ -51,18 +51,18 @@ public class MasterPlayListValidator {
 			// At this point needs to be a tag, will never be in this context if on a URL
 			if (!line.startsWith(Tokens.tagBegin)){
 				//log error non-comment, non-tag line
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location() , Err.Sev.WARN.toString(), Err.Type.FORMAT.toString(), "Expected TAG or Comment");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum) , Err.Sev.WARN.toString(), Err.Type.FORMAT.toString(), "Expected TAG or Comment");
 				LogStreamError(msg, 20);
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "Non-comment, non-tag, non-blank line, and do not expect URL");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "Non-comment, non-tag, non-blank line, and do not expect URL");
 				LogTrace(msg, 20);
 				continue;
 			}
 			// Check for zero extra whitespace at begin/end
 			if (line.trim().length() != line.length()){
 				// log error tag line with extra whitespace
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location() , Err.Sev.WARN.toString(), Err.Type.FORMAT.toString(), "Leading or Trailing whitespace");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum) , Err.Sev.WARN.toString(), Err.Type.FORMAT.toString(), "Leading or Trailing whitespace");
 				LogStreamError(msg, 20);
-				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "Leading or Trailing whitespace");
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "Leading or Trailing whitespace");
 				LogTrace(msg, 20);
 			}
 			
@@ -75,9 +75,9 @@ public class MasterPlayListValidator {
 				// actually for production code should throw an exception that makes it back to the 
 				// client
 				if (!extTag.Validate(candidateTag, listScanner)){
-					msg = new MSG(GetTimeStamp(), masterPlayList.Location() , Err.Sev.ERROR.toString(), Err.Type.INTERNAL.toString(), "Cannot continue - Exiting...");
+					msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum) , Err.Sev.ERROR.toString(), Err.Type.INTERNAL.toString(), "Cannot continue - Exiting...");
 					LogStreamError(msg);
-					msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "ExtTag Validators Invoke fail");
+					msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "ExtTag Validators Invoke fail");
 					LogTrace(msg);
 					System.exit(-1);
 				}
@@ -106,9 +106,9 @@ public class MasterPlayListValidator {
 				MediaListExtTag extTag =  new MediaListExtTag(masterPlayList, listScanner, candidateTag);
 				extTag.Validate(candidateTag, listScanner);
 				if (extTag.IsValid()){
-					msg = new MSG(GetTimeStamp(), masterPlayList.Location() , Err.Sev.ERROR.toString(), Err.Type.INTERNAL.toString(), "Validation logic fail");
+					msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum) , Err.Sev.ERROR.toString(), Err.Type.INTERNAL.toString(), "Validation logic fail");
 					LogStreamError(msg);
-					msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "Logic validated media tag in Master Playlist");
+					msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "Logic validated media tag in Master Playlist");
 					LogTrace(msg);
 					extTag.MarkBad();
 				}
@@ -117,9 +117,9 @@ public class MasterPlayListValidator {
 				continue;
 			}
 			// line started with tagBegin, but was not recognized - could be no validator or a bad TAG, well say TAG
-			msg = new MSG(GetTimeStamp(), masterPlayList.Location() , Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Unrecognized Tag:"+candidateTag);
+			msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum) , Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Unrecognized Tag:"+candidateTag);
 			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "Unrecognized Tag:"+candidateTag);
+			msg = new MSG(GetTimeStamp(), masterPlayList.Location(listScanner.currLineNum), Context() , "Unrecognized Tag:"+candidateTag);
 			LogTrace(msg);		
 		}
 		

@@ -67,6 +67,11 @@ public class PlayList {
 		// }
 		return toString() + "::LINE::" + Integer.toString(lineNum);
 	}
+	
+	//overload for validators when unrecognized tag or line, need to put current scanner line number in
+	public String Location(int currLineNum) {
+		return toString() + "::LINE::" + Integer.toString(currLineNum);
+	}
 
 	public String Context() {
 		String context = new String("Context:");
