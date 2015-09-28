@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import prototyping.ExtTag.MSG;
+
 //import prototyping.ExtTag.MSG;
 
 public class MediaListExtTag extends ExtTagStream {
@@ -77,7 +79,33 @@ public class MediaListExtTag extends ExtTagStream {
 
 	// private static void EXTINF(ExtTag This)
 	private void EXTINF(PlayListScanner scanner) {
-		// need to download
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern 
+		if (!Tokens.EXTINFpattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		
+		// check if endlist was already found
+		if (((MediaPlayList)containingList).endListFound){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "No segments allowed after EXT-X-ENDLIST");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "No segments allowed after EXT-X-ENDLIST");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		
+		// need to download - find next URL
 		while (scanner.scanner.hasNext()){
 			String urlLine = scanner.GetNextLine();
 			// skip comments and blank lines
@@ -87,9 +115,9 @@ public class MediaListExtTag extends ExtTagStream {
 				GetStream(urlLine);  // will mark bad if any problem getting stream
 				break; // done in this loop, need to validate remaining line
 			}
-			else {
+			else if (!urlLine.startsWith(Tokens.tagBegin)){
 				// next line is a tag - log missing url (vs malformed)
-				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for media (.ts)");
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for MediaPlayList");
 				LogStreamError(msg);
 				// rewind to line just before tag
 				int curLine = scanner.currLineNum;
@@ -98,15 +126,16 @@ public class MediaListExtTag extends ExtTagStream {
 				validated = false;
 				return;
 			}
+			// did we hit EOF before found URL?
+			if (!scanner.scanner.hasNext())
+			{
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
+				LogStreamError(msg);
+				validated = false;
+				return;
+			}
 		} 
-		// did we hit EOF before found URL?
-		if (!scanner.scanner.hasNext())
-		{
-			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
-			LogStreamError(msg);
-			validated = false;
-			return;
-		}
+
 		// if still validated check rest of the tag line (myLine), and .ts file characteristics
 		if (validated){
 			// 
@@ -116,26 +145,108 @@ public class MediaListExtTag extends ExtTagStream {
 
 	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
 
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern 
+		if (!Tokens.EXT_X_MEDIA_SEQUENCEpattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		
 	}
 
 	private void EXT_X_ENDLIST(PlayListScanner scanner) {
 
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, matches ok here
+		if (!Tokens.EXT_X_ENDLISTpattern.matcher(myLine).matches()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		// set playlist endlist found
+		((MediaPlayList)containingList).endListFound = true;
 	}
 
 	private void EXT_X_TARGETDURATION(PlayListScanner scanner) {
 
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+		if (!Tokens.EXT_X_TARGETDURATIONpattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+
 	}
 
 	private void EXT_X_START(PlayListScanner scanner) {
 
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, matches() tbd
+//		if (!Tokens.EXT_X_STARTpattern.matcher(myLine).matches()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+
 	}
 
 	private void EXT_X_PLAYLIST_TYPE(PlayListScanner scanner) {
 
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//		if (!Tokens.EXT_X_PLAYLIST_TYPEpattern.matcher(myLine).find()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		
+
 	}
 }

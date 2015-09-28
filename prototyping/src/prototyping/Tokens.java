@@ -1,4 +1,7 @@
 package prototyping;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -48,8 +51,8 @@ public class Tokens {
 	public static String EXT_X_STREAM_INF = "EXT-X-STREAM-INF";
     public static String EXT_X_MEDIA = "EXT-X-MEDIA";
     // Tag Match Patterns
-	public static Pattern EXT_X_STREAM_INFpattern = Pattern.compile(beginLineExp+EXT_X_STREAM_INF+"$");
-	public static Pattern EXT_X_MEDIApattern = Pattern.compile(beginLineExp+EXT_X_MEDIA+"$");
+	public static Pattern EXT_X_STREAM_INFpattern = Pattern.compile(beginLineExp+EXT_X_STREAM_INF+tagEnd);
+	public static Pattern EXT_X_MEDIApattern = Pattern.compile(beginLineExp+EXT_X_MEDIA+tagEnd);
     
     // media playlist tokens
     // Other
@@ -71,8 +74,74 @@ public class Tokens {
     public static String EXT_X_START  = "EXT-X-START";
     // Tag Match Patterns
     public static final Pattern EXTINFpattern = Pattern.compile(beginLineExp+EXTINF+tagEnd+"("+floatRegExp+")(?:,(.+)?)?$");
-    public static final Pattern EXT_X_ENDLISTpattern = Pattern.compile(beginLineExp+tagEnd+"$");
+    public static final Pattern EXT_X_ENDLISTpattern = Pattern.compile(beginLineExp+EXT_X_ENDLIST+tagEnd+"$");
     public static final Pattern EXT_X_MEDIA_SEQUENCEpattern = Pattern.compile(beginLineExp+EXT_X_MEDIA_SEQUENCE+tagEnd+"("+integerRegExp+")$");
     public static final Pattern EXT_X_TARGETDURATIONpattern = Pattern.compile(beginLineExp+EXT_X_TARGETDURATION+tagEnd+ "("+integerRegExp+")$");
-    	
+    
+	// Attribute Patterns
+	public static Pattern resolutionPattern = Pattern.compile("^("+integerRegExp+")x("+integerRegExp+")$");
+	
+    
+    // Get token methods - algos copied from a number of sources
+    public static int GetNextInt(String line) throws TokenNotFoundException {
+        Matcher matcher = integerPattern.matcher(line);
+        if (matcher.find()){   	
+        	String temp = matcher.group();
+        	return Integer.parseInt(matcher.group());}
+        else{
+        	throw new TokenNotFoundException("Integer value not found");
+        }
+    }
+
+    public static <T extends Enum<T>> T GetEnum(String line, Class<T> enumType){
+            return Enum.valueOf(enumType, line);
+    }
+
+    public static float GetNextFloat(String line) throws TokenNotFoundException {
+        Matcher matcher = floatPattern.matcher(line);
+        if (matcher.find()){   	
+        	return Float.parseFloat(matcher.group());
+        }
+        else{
+        	throw new TokenNotFoundException("Float value not found");
+        }
+    }
+    
+    public static List<Byte> GetNextHex(String line) throws TokenNotFoundException {
+        List<Byte> bytes = new ArrayList<Byte>();
+        Matcher matcher = hexPattern.matcher(line.toUpperCase());
+
+        if (matcher.find()) {
+            String value = matcher.group();
+
+            for (char c : value.toCharArray()) {
+                bytes.add(ConverHextoByte(c));
+            }
+            return bytes;
+        } else {
+        	throw new TokenNotFoundException("Hex value not found");
+        }
+    }
+    
+    public static byte ConverHextoByte(char hex) {
+        if (hex >= 'A') {
+            return (byte) ((hex & 0xF) + 9);
+        } else {
+            return (byte) (hex & 0xF);
+        }
+    }
+
+
+    public static Attribute.Resolution GetNextResolution(String line) throws TokenNotFoundException {
+        Matcher matcher = resolutionPattern.matcher(line);
+        if (matcher.find()) {
+            return new Attribute().Resolution(GetNextInt(matcher.group(1)), GetNextInt(matcher.group(2)));
+        } else {
+        	throw new TokenNotFoundException("Resolution not found");
+        }
+    }
 }
+
+ 
+    	
+

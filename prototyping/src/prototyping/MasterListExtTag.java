@@ -4,6 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+
+import prototyping.ExtTag.MSG;
 
 public class MasterListExtTag extends ExtTagStream {
 
@@ -68,11 +71,24 @@ public class MasterListExtTag extends ExtTagStream {
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
 	private void EXT_X_STREAM_INF(PlayListScanner scanner){
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
 		if (!containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
 			validated = false;
 			return;
 		}
-		// need to download
+		// check tag pattern, find() since attributes follow
+		//Matcher matcher = Tokens.EXT_X_STREAM_INFpattern.matcher(myLine);
+		if (!Tokens.EXT_X_STREAM_INFpattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		// need to download - find URL
 		while (scanner.scanner.hasNext()){
 			String urlLine = scanner.GetNextLine();
 			// skip comments and blank lines
@@ -82,9 +98,9 @@ public class MasterListExtTag extends ExtTagStream {
 				GetStream(urlLine);  // will mark bad if any problem getting stream
 				break; // done in this loop, need to validate remaining line
 			}
-			else {
+			else if (!urlLine.startsWith(Tokens.tagBegin)){
 				// next line is a tag - log missing url (vs malformed)
-				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for MediaPlayList");
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "missing URL line for MediaPlayList");
 				LogStreamError(msg);
 				// rewind to line just before tag
 				int curLine = scanner.currLineNum;
@@ -93,15 +109,16 @@ public class MasterListExtTag extends ExtTagStream {
 				validated = false;
 				return;
 			}
+			// did we hit EOF before found URL?
+			if (!scanner.scanner.hasNext())
+			{
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
+				LogStreamError(msg);
+				validated = false;
+				return;
+			}
 		} 
-		// did we hit EOF before found URL?
-		if (!scanner.scanner.hasNext())
-		{
-			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "EOF hit before URL found");
-			LogStreamError(msg);
-			validated = false;
-			return;
-		}
+
 		// if still validated check rest of the tag line (myLine)
 		if (validated){
 			// 
@@ -109,7 +126,23 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	private void EXT_X_MEDIA(PlayListScanner scanner){
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (!containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() since attributes follow
+		if (!Tokens.EXT_X_MEDIApattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		
 	}
 	
 }

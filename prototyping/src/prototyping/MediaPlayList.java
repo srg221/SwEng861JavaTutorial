@@ -8,6 +8,8 @@ public class MediaPlayList extends PlayList {
 	public MasterPlayList masterPlayList = null; // referring list, or if this
 													// is root remains null
 	public ArrayList<ExtTagStream> validMediaStreams = new ArrayList<ExtTagStream>();
+	
+	public boolean endListFound = false;
 
 	public MediaPlayList(String url, MediaStream inMediaStream,
 			PlayList master, int inLineNo) {

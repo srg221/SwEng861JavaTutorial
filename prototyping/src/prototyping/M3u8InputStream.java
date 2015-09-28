@@ -59,7 +59,7 @@ public class M3u8InputStream {
 			myUrl = new URL(url);
 		} catch (MalformedURLException e) {
 			validated = false;
-			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed URL "+myStrUrl+ " Exception:"+e.getCause());
+			MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "Malformed URL "+myStrUrl+ " Exception:"+e.getMessage());
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 			LogTrace(msg, 20);
@@ -82,7 +82,7 @@ public class M3u8InputStream {
 				//e.printStackTrace();
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);				
-				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Cannot open connection to " +myStrUrl+ " failed. Exception:"+e.getCause());
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Cannot open connection to " +myStrUrl+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
 				validated = false;
 				return;
@@ -112,8 +112,7 @@ public class M3u8InputStream {
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Get input stream " +myStrUrl+ " success.");
 				LogTrace(msg, 40);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Opening connection to " +myStrUrl+ " failed. Exception:"+e.getCause());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Opening connection to " +myStrUrl+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
 				msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);
@@ -142,10 +141,9 @@ public class M3u8InputStream {
 			} catch (IOException e) {
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);				
-				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Create file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Create file " +myLocalFile.getPath()+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
 				validated = false;
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 				return;
 			}
@@ -159,9 +157,8 @@ public class M3u8InputStream {
 			} catch (FileNotFoundException e) {
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);				
-				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
-				// TODO Auto-generated catch block
 				// e.printStackTrace();
 				validated = false;
 				return;
@@ -172,9 +169,8 @@ public class M3u8InputStream {
 				LogTrace(msg, 40);
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Download " +myStrUrl+ " failed. Exception:"+e.getCause());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.URL.toString(), "Download " +myStrUrl+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
 				msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);
@@ -196,25 +192,12 @@ public class M3u8InputStream {
 			} catch (IOException e) {
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);				
-				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 				validated = false;
 				return;
 			}
-			// testing
-			//MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " success");
-			//LogTrace(msg, 20);
-			//msg = new MSG(GetTimeStamp(), Location(), Err.Sev.INFO.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " success");
-			//LogStreamError(msg);
-
-//			// TODO Auto-generated catch block
-//			// e.printStackTrace();
-//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.URL.toString(), "download from " +myStrUrl+ " failed");
-//			LogStreamError(msg);
-//			msg = new MSG(GetTimeStamp(), Location(), Context(), "download from " +myStrUrl+ " failed");
-//			LogTrace(msg, 20);
 		
 	}
 
@@ -232,9 +215,8 @@ public class M3u8InputStream {
 			} catch (IOException e) {
 				MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 				LogTrace(msg, 20);				
-				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Closing file " +myLocalFile.getPath()+ " failed. Exception:"+e.getMessage());
 				LogStreamError(msg);
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 				validated = false;
 			}
@@ -244,17 +226,15 @@ public class M3u8InputStream {
 		} catch (FileNotFoundException e) {
 			MSG msg = new MSG(GetTimeStamp(), Location(), Context(), "Exception:" + e.getMessage()+":"+e.getCause());
 			LogTrace(msg, 20);				
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getCause());
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.FILE.toString(), "Opening file " +myLocalFile.getPath()+ " failed. Exception:"+e.getMessage());
 			LogStreamError(msg);
 			validated = false;
-			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
 		return myInputStream;
 	}
 
 	public String GetUrlNoFN() {
-		// String fName = mUrl.getFile();
 		String sUrl = myUrl.toString();
 		// return sUrl.substring(0, sUrl.indexOf(fName));
 		return ((String) sUrl.subSequence(0, sUrl.lastIndexOf('/')));
@@ -300,14 +280,15 @@ public class M3u8InputStream {
 			}
 		}
 
-		// for contained
+		// for contained 
 		public MSG(ArrayList<String> infields) {
 			fields = new ArrayList<String>();
 			for (String field : infields) {
 				fields.add(field);
 			}
 		}
-
+		// was needed at one point in development
+		// works, but not used now
 		public MSG Prefix(MSG prefix) {
 			String[] tmp = new String[fields.size()];
 			int i = 0;
@@ -333,7 +314,7 @@ public class M3u8InputStream {
 
 	}
 
-	// for use at this level
+	// for use at this level -  the "M3u8InputStream level"
 	public void LogStreamError(MSG msg) {
 		if (myTag != null)
 			myTag.LogStreamError(msg.fields);
@@ -366,7 +347,8 @@ public class M3u8InputStream {
 		}
 	}
 
-	// for contained levels - probably don't exist
+	// for contained levels - don't exist now
+	// maybe never will, showing for completeness
 	public void LogStreamError(ArrayList<String> fields) {
 		MSG msg = new MSG(fields);
 		if (myTag != null) {

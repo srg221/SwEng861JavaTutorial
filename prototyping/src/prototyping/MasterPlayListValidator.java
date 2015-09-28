@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import prototyping.ExtTag.MSG;
+
 public class MasterPlayListValidator {
 
 	private PlayListScanner listScanner;
@@ -35,6 +37,14 @@ public class MasterPlayListValidator {
 		LogTrace(msg, 40);
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.GetNextLine();
+			// special handling for line 1 since it needs to be a EXTM3U tag
+			// can't do further down since only want to complain once...
+			if (listScanner.currLineNum == 1 && !Tokens.EXTM3Upattern.matcher(listScanner.currLine).matches()  ){
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "List does not start with EXTM3U Tag");
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), masterPlayList.Location(), Context() , "List does not start with EXTM3U Tag");
+				LogTrace(msg, 20);
+			}
 			// skip well formed comments and completely blank lines
 			if (listScanner.IsBlanksOrComment(line))
 				continue;
@@ -56,8 +66,6 @@ public class MasterPlayListValidator {
 				LogTrace(msg, 20);
 			}
 			
-			// Set candidateTag = to EXTM3U or everything up to end tag
-			//    need to have error it no endtag found
 			// try candidate on each tag type, when find, create tag and validate
 			String candidateTag = ExtTag.GetCandidateTag(line);
 			if (ExtTag.HasValidator(candidateTag)){

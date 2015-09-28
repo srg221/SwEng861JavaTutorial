@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 
 //import prototyping.PlayList.MSG;
@@ -19,6 +20,7 @@ public class ExtTag {
 	public String myTagName;
 	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
+	public Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
 												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" } 
@@ -144,13 +146,64 @@ public class ExtTag {
 	
 	// private static void EXTM3U(ExtTag This)
 	private void EXTM3U(PlayListScanner scanner) {
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		// check tag pattern. matches() since exact
+		if (!Tokens.EXTM3Upattern.matcher(myLine).matches()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Extra characters in line");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Extra characters in line");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		// needs to be first line
+		if (myLineNumber != 1){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Not first line in list");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Not first line in list");
+			LogTrace(msg, 20);
+			validated = false;
+		}
 	}
 
 	// private static void EXT_X_VERSION(ExtTag This)
 	private void EXT_X_VERSION(PlayListScanner scanner) {
-
-		validated = true;
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		// check tag format pattern,
+		Matcher matcher = Tokens.EXT_X_VERSIONpattern.matcher(myLine);
+		if (!matcher.find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		if (containingList.version != -1){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Version previously set to "+Integer.toString(containingList.version));
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duplicate Version Tag");
+			LogTrace(msg, 20);
+			validated = false;
+			return;
+		}
+		// get version
+		// advance past tag
+		String remaining = myLine.substring(myLine.indexOf(Tokens.tagEnd)+1);
+		int v;
+		try {
+			v = Tokens.GetNextInt(remaining);
+			if (v>0){
+				containingList.version = v;
+				return;
+			}
+		} catch (TokenNotFoundException e) {
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Specified version is not an integer");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "version not an int. Exception:" + e.getMessage()+":"+e.getCause());
+			LogTrace(msg, 20);
+			validated = false;
+		}
 	}
 
 	// logging utils at ExtTag level
@@ -158,19 +211,6 @@ public class ExtTag {
 
 	// some wrappers to make code reading easier, would be simpler
 	// if java let you overload operators
-	// public class MSG{
-	// private String[] fields;
-	// //private String[] fixedFields;
-	//
-	// public MSG(String... infields){
-	// fields[0] = Integer.toString(myLineNumber);
-	// fields[1] = myTagName;
-	// int i = 1;
-	// for (String field : infields){
-	// fields[i++] = new String(field);
-	// }
-	// }
-	// }
 
 	public class MSG {
 		private ArrayList<String> fields;
@@ -195,7 +235,7 @@ public class ExtTag {
 		}
 	}
 
-	// for use at this level
+	// for use at this ("the ExtTag") level
 	public void LogStreamError(MSG msg) {
 		containingList.LogStreamError(msg.fields);
 	}
@@ -212,7 +252,7 @@ public class ExtTag {
 		containingList.LogTrace(msg.fields, paranoid);
 	}
 
-	// for contained levels
+	// for contained (M3u8InputStream) levels
 	public void LogStreamError(ArrayList<String> fields) {
 		MSG msg = new MSG(fields);
 		containingList.LogStreamError(msg.fields);

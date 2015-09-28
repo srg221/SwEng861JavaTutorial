@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import prototyping.MasterPlayListValidator.MSG;
+
 //import prototyping.MasterPlayListValidator.MSG;
 
 public class MediaPlayListValidator {
@@ -41,9 +43,19 @@ public class MediaPlayListValidator {
 		LogTrace(msg, 40);
 		while (listScanner.scanner.hasNext()) {
 			String line = listScanner.GetNextLine();
+			
+			// special handling for line 1 since it needs to be a EXTM3U tag
+			// can't do further down since only want to complain once...
+			if (listScanner.currLineNum == 1 && !Tokens.EXTM3Upattern.matcher(listScanner.currLine).matches()  ){
+				msg = new MSG(GetTimeStamp(), mediaPlayList.Location(), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "List does not start with EXTM3U Tag");
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), mediaPlayList.Location(), Context() , "List does not start with EXTM3U Tag");
+				LogTrace(msg, 20);
+			}
 			// skip well formed comments and completely blank lines
 			if (listScanner.IsBlanksOrComment(line))
 				continue;
+			
 			// At this point needs to be a tag, will never be in this context if on a URL
 			if (!line.startsWith(Tokens.tagBegin)){
 				//log error non-comment, non-tag line
@@ -53,6 +65,7 @@ public class MediaPlayListValidator {
 				LogTrace(msg, 20);
 				continue;
 			}
+			
 			// Check for zero extra whitespace at begin/end
 			if (line.trim().length() != line.length()){
 				// log error tag line with extra whitespace
@@ -120,7 +133,7 @@ public class MediaPlayListValidator {
 			LogTrace(msg);			
 	}
 
-	// pick out streams
+	// pick out streams, note they were already downloaded as part of tag validation
 	for (ExtTag tag : mediaPlayList.validTags){
 	if (tag.myTagName.equals(Tokens.EXTINF)){
 		if (tag.IsValid())

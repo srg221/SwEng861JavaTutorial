@@ -22,15 +22,7 @@ public class MediaStream {
 	//public Handler mErrorLogHandler = null;
 	
 	MediaStream(String rootUrl, String inRootDirectory) {
-	
-//		// set up local directory path
-//		String localPath;
-//		if ( inRootDirectory == null)
-//			localPath = System.getProperty("user.home");
-//		else
-//			localPath = inRootDirectory;
-//		// temp for parsing convenience only
-		// this one is for all to use as base
+
 		rootDirectory = new String(inRootDirectory);
 		// temps - these ones are to build path for logs and 
 		// validate root URL and local file system access check
@@ -56,28 +48,26 @@ public class MediaStream {
 
 		// find root file name to build log filenames
 		String rootFileName = localPath.substring(0, localPath.lastIndexOf('.'));
-		// paranoid here
-		//rootFileName.toLowerCase();
-		//rootFileName += (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
 
 		// create logs
 		CreateLoggers(rootFileName);
-		// using max paranoids unless someone sets lower
+		// using max paranoids unless someone sets lower, production code should at least 
+		// pass levels in constructor, provide api, or read from shared mem so can change on the fly
 		streamLogger.SetParanoidLevel(100);
 		traceLogger.SetParanoidLevel(100);
 		
-		// headers 
+		// Stream log header & start informational message
 		MSG msg = new MSG("Error No.","Time", "Location", "Severity", "Type", "Details");
 		LogStreamError(msg);
 		msg = new MSG(GetTimeStamp(), "", Err.Sev.INFO.toString(),"", "Analysis Started: Root URL = "+rootUrl);
 		LogStreamError(msg);
+		// Trace (debug) log header and start msg
 		msg = new MSG("Trace No.","Time","Current Stream Item", "Context","Details");
 		LogTrace(msg);
-		// trace timestamp creation time 
 		msg = new MSG(GetTimeStamp(),"","","Media Stream Created: Root URL = "+rootUrl );
 		LogTrace(msg, 20);
 				
-		//Initialize the validators - this also calls down to leafs
+		//Initialize the ExtTag validators - this also calls down to leafs
 		if (!ExtTag.Initialize()) {
 			// this is a coding error, stacks are dumped in ExtTag and its leaf classes
 			// post fatal internal error and exit here
@@ -92,6 +82,7 @@ public class MediaStream {
 		rootPlaylist = new PlayList(rootUrl, this);	
 	}
 	
+	// constructor with no local root path, use user home directory
 	MediaStream(String rootUrl) {
 		this(rootUrl,System.getProperty("user.home"));
 	}
@@ -123,27 +114,7 @@ public class MediaStream {
 
 	private void CreateLoggers(String rootFileName){
 
-//		// set up logs - always using user directories
-//		//String localLogPath = System.getProperty("user.home");
-//		// temp for parsing convenience only
-//		URL tmpURL;
-//		try {
-//			tmpURL = new URL(rootUrl);
-//		} catch (MalformedURLException e) {
-//			// Bad URL - need to log to console since can't make logs
-//			System.out.println("Bad root URL, cannot parse:\n" + rootUrl);
-//			return false;
-//		} 
-//		// create a local directory for each distinct root url
-//		String localPath = localLogPath + tmpURL.getPath();
-//		File relativePath = new File( (String) localPath.subSequence(0, localPath.lastIndexOf('/')) );
-//		relativePath.mkdirs();
-		// find root file name to build log filenames
-		//String rootFileName = logDirectory.substring(localPath.lastIndexOf('/'));
-		// paranoid here
-		//String LRootFileName = rootFileName.toLowerCase();
-		//rootFileName = (String)rootFileName.subSequence(0, rootFileName.lastIndexOf('.'));
-		// make complete paths, delete files if they already exist
+		// make complete paths to log files, delete files if they already exist
 		String traceLogPath = rootFileName + "TraceLog.csv";
 		String streamLogPath = rootFileName + "StreamLog.csv";
 		File runLogFile = new File(traceLogPath);
@@ -177,7 +148,9 @@ public class MediaStream {
 		// success if get this far
 	}
 	
-	// logging utils
+	// logging utils for trace and stream validation logs
+	// Pay no attention to the man behind the curtain, i.e. has
+	// some neat ideas, but not production quality...
 	
 	static String Context() {
 		String context = new String("Context:");
@@ -232,7 +205,7 @@ public class MediaStream {
     	}
     }
     
-    // for local
+    // for local logging at "Media Stream Level"
  	public void LogStreamError(MSG msg, int paranoidLevel){
 		streamLogger.Log(msg.fields, paranoidLevel);
 	}
@@ -249,7 +222,7 @@ public class MediaStream {
 		traceLogger.Log(msg.fields);
 	}
 	
-	// for contained
+	// for contained (Playlist down to tags)
  	public void LogStreamError(ArrayList<String> fields, int paranoidLevel){
 		MSG msg = new MSG(fields);
  		streamLogger.Log(msg.fields, paranoidLevel);
