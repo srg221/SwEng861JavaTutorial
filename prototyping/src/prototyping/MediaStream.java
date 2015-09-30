@@ -143,7 +143,7 @@ public class MediaStream {
 		}
 		// output to console since would need to find logs to see the log created messages
 		System.out.println("Stream error log created:\n" + streamLogPath);
-		System.out.println("Run error log created:\n" + traceLogPath);
+		System.out.println("Run trace log created:\n" + traceLogPath);
 		
 		// success if get this far
 	}

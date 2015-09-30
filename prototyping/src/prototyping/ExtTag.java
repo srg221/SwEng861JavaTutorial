@@ -23,8 +23,9 @@ public class ExtTag {
 	public Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
-												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" } 
-											  };
+												{ Tokens.EXT_X_INDEPENDENT_SEGMENTS, "EXT_X_INDEPENDENT_SEGMENTS" }, 
+												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" },
+												{ Tokens.EXT_X_START, "EXT_X_START" } };
 
 	ExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
 		// parent reference
@@ -180,7 +181,7 @@ public class ExtTag {
 			validated = false;
 		}
 		if (containingList.version != -1){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Version previously set to "+Integer.toString(containingList.version));
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "Version previously set to "+Integer.toString(containingList.version));
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duplicate Version Tag");
 			LogTrace(msg, 20);
@@ -205,7 +206,47 @@ public class ExtTag {
 			validated = false;
 		}
 	}
+	
+	private void EXT_X_INDEPENDENT_SEGMENTS(PlayListScanner scanner) {
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		// check tag pattern. matches() since exact
+//		if (!Tokens.EXT_X_INDEPENDENT_SEGMENTSpattern.matcher(myLine).matches()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Extra characters in line");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Extra characters in line");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
 
+	private void EXT_X_START(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+
+		// check tag pattern, matches() tbd
+//		if (!Tokens.EXT_X_STARTpattern.matcher(myLine).matches()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+
+	
 	// logging utils at ExtTag level
 	// More logging stuff/utilities
 

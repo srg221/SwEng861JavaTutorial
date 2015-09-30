@@ -21,15 +21,18 @@ public class Tokens {
     public static String floatRegExp = "\\d+\\.?\\d*";
     public static String hexRegExp = "^0[x|X]([0-9A-F]+)$";
     public static String beginLineExp = "^#";
-    // Common patterns
+    // Common patterns 
     public static Pattern urlPattern = Pattern.compile(urlRegExp);
     public static Pattern urlPattern2 = Pattern.compile(urlRegExp2);
     public static Pattern integerPattern = Pattern.compile(integerRegExp);
     public static Pattern floatPattern = Pattern.compile(floatRegExp);
     public static Pattern hexPattern = Pattern.compile(hexRegExp);
-	// Tags
-	public static String EXTM3U = "EXTM3U";
-	public static String EXT_X_VERSION = "EXT-X-VERSION";
+	// Basic Tags  4.3.1
+	public static String EXTM3U = "EXTM3U"; //4.3.1.1
+	public static String EXT_X_VERSION = "EXT-X-VERSION"; //4.3.1.2
+	// Media or Master Playlist tags 4.3.5
+	public static String EXT_X_INDEPENDENT_SEGMENTS  = "EXT-X-INDEPENDENT-SEGMENTS"; // 4.3.5.1
+	public static String EXT_X_START  = "EXT-X-START"; // 4.3.5.2
 	// Tag Match Patterns
 	public static Pattern EXTM3Upattern = Pattern.compile(beginLineExp+EXTM3U+"$");
 	//public static Pattern EXT_X_VERSIONpattern = Pattern.compile("^#"+EXT_X_VERSION+tagEnd+"("+integerRegExp+")$");
@@ -47,9 +50,9 @@ public class Tokens {
     public static String DEFAULT = "DEFAULT";
     public static String FORCED = "FORCED";
     public static String AUTO_SELECT = "AUTOSELECT";
-    // Tags
-	public static String EXT_X_STREAM_INF = "EXT-X-STREAM-INF";
-    public static String EXT_X_MEDIA = "EXT-X-MEDIA";
+    // Tags 4.3.4
+    public static String EXT_X_MEDIA = "EXT-X-MEDIA";  //4.3.4.1
+	public static String EXT_X_STREAM_INF = "EXT-X-STREAM-INF"; //4.3.4.2
     // Tag Match Patterns
 	public static Pattern EXT_X_STREAM_INFpattern = Pattern.compile(beginLineExp+EXT_X_STREAM_INF+tagEnd);
 	public static Pattern EXT_X_MEDIApattern = Pattern.compile(beginLineExp+EXT_X_MEDIA+tagEnd);
@@ -62,16 +65,21 @@ public class Tokens {
     public static String IV = "IV";
     public static String KEY_FORMAT = "KEYFORMAT";
     public static String KEY_FORMAT_VERSIONS = "KEYFORMATVERSIONS";
-    // Tags
-    public static String EXTINF = "EXTINF";
-    public static String EXT_X_MEDIA_SEQUENCE = "EXT-X-MEDIA-SEQUENCE";
-    public static String EXT_X_ALLOW_CACHE = "EXT-X-ALLOW-CACHE";
-    public static String EXT_X_ENDLIST = "EXT-X-ENDLIST";
-    public static String EXT_X_I_FRAMES_ONLY = "EXT-X-I-FRAMES-ONLY";
-    public static String EXT_X_TARGETDURATION  = "EXT-X-TARGETDURATION";
-    public static String EXT_X_KEY = "EXT-X-KEY";
-    public static String EXT_X_PLAYLIST_TYPE = "EXT-X-PLAYLIST-TYPE";
-    public static String EXT_X_START  = "EXT-X-START";
+	// Media Segment Tags 4.3.2
+	public static String EXTINF = "EXTINF"; //4.3.2.1
+	public static String EXT_X_BYTERANGE = "EXT_X_BYTERANGE"; //4.3.2.2
+	public static String EXT_X_DISCONTINUITY = "EXT-X-DISCONTINUITY"; //4.3.2.3
+	public static String EXT_X_KEY = "EXT-X-KEY"; //4.3.2.4
+	public static String EXT_X_MAP = "EXT-X-MAP"; //4.3.2.5
+	public static String EXT_X_PROGRAM_DATE_TIME = "EXT-X-PROGRAM-DATE-TIME"; //4.3.2.6
+	// Media PlayList Tags 4.3.3
+	public static String EXT_X_TARGETDURATION  = "EXT-X-TARGETDURATION";  //4.3.3.1
+	public static String EXT_X_MEDIA_SEQUENCE = "EXT-X-MEDIA-SEQUENCE";  //4.3.3.2
+	public static String EXT_X_DISCONTINUITY_SEQUENCE = "EXT-X-DISCONTINUITY-SEQUENCE"; //4.3.3.3
+	public static String EXT_X_ENDLIST = "EXT-X-ENDLIST"; // 4.3.3.4
+	public static String EXT_X_PLAYLIST_TYPE = "EXT-X-PLAYLIST-TYPE"; //4.3.3.5
+	public static String EXT_X_I_FRAMES_ONLY = "EXT-X-I-FRAMES-ONLY"; // 4.3.3.6
+	public static String EXT_X_ALLOW_CACHE = "EXT-X-ALLOW-CACHE"; // not valid after ver 7
     // Tag Match Patterns
     public static final Pattern EXTINFpattern = Pattern.compile(beginLineExp+EXTINF+tagEnd+"("+floatRegExp+")(?:,(.+)?)?$");
     public static final Pattern EXT_X_ENDLISTpattern = Pattern.compile(beginLineExp+EXT_X_ENDLIST+"$");
@@ -80,6 +88,15 @@ public class Tokens {
     
 	// Attribute Patterns
 	public static Pattern resolutionPattern = Pattern.compile("^("+integerRegExp+")x("+integerRegExp+")$");
+	
+	// version notes
+	// ver>=2 needed for IV attr of EXT-X-KEY tag req ver>=2
+	// ver>=3 Floating Point duration values of EXTINF 
+	// ver>=4 EXT-X-BYTERANGE and  EXT-X-I-FRAMES-ONLY  
+	// ver>=5 EXT-X-MAP, KEYFORMAT and KEYFORMATVERSIONS attributes of the EXT-X-KEY tag
+	// ver>=6 EXT-X-MAP tag in a Media Playlist that does not contain EXTX-	I-FRAMES-ONLY
+	// PROGRAM-ID attr removed from EXT-X-STREAM-INF & EXT-X-IFRAME-STREAM-INF after ver 7
+	// ver>=7  needed for SERVICE values of INSTREAM-ID attr of EXT-X-MEDIA 
 	
     
     // Get token methods - algos copied from a number of sources

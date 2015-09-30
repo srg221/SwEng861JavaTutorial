@@ -135,13 +135,19 @@ public class MasterListExtTag extends ExtTagStream {
 			return;
 		}
 		// check tag pattern, find() since attributes follow
-		if (!Tokens.EXT_X_MEDIApattern.matcher(myLine).find()){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
-			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
-			LogTrace(msg, 20);
-			validated = false;
-		}
+//		if (!Tokens.EXT_X_MEDIApattern.matcher(myLine).find()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
 		
 	}
 	

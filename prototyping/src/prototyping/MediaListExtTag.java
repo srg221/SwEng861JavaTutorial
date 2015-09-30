@@ -16,8 +16,14 @@ public class MediaListExtTag extends ExtTagStream {
 			{ Tokens.EXT_X_MEDIA_SEQUENCE, "EXT_X_MEDIA_SEQUENCE" },
 			{ Tokens.EXT_X_ENDLIST, "EXT_X_ENDLIST" },
 			{ Tokens.EXT_X_TARGETDURATION, "EXT_X_TARGETDURATION" },
-			{ Tokens.EXT_X_START, "EXT_X_START" },
-			{ Tokens.EXT_X_PLAYLIST_TYPE, "EXT_X_PLAYLIST_TYPE" } };
+			{ Tokens.EXT_X_KEY, "EXT_X_KEY" },
+			{ Tokens.EXT_X_DISCONTINUITY_SEQUENCE, "EXT_X_DISCONTINUITY_SEQUENCE" },
+			{ Tokens.EXT_X_BYTERANGE, "EXT_X_BYTERANGE" },
+			{ Tokens.EXT_X_I_FRAMES_ONLY, "EXT_X_I_FRAMES_ONLY" },
+			{ Tokens.EXT_X_MAP, "EXT_X_MAP" },
+			{ Tokens.EXT_X_PROGRAM_DATE_TIME, "EXT_X_PROGRAM_DATE_TIME" },
+			{ Tokens.EXT_X_PLAYLIST_TYPE, "EXT_X_PLAYLIST_TYPE" }, 
+			{ Tokens.EXT_X_ALLOW_CACHE, "EXT_X_ALLOW_CACHE" } };
 
 	// MediaListExtTag(PlayList playList, PlayListScanner scanner, String
 	// tagName,
@@ -142,28 +148,7 @@ public class MediaListExtTag extends ExtTagStream {
 		}
 
 	}
-
-	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
-
-		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
-		LogTrace(msg, 40);
-		if (containingList.IsMaster()){
-			// error for this is logged in validator since if we got here,
-			// It has to be a coding error, just need to mark false.
-			validated = false;
-			return;
-		}
-		// check tag pattern 
-		if (!Tokens.EXT_X_MEDIA_SEQUENCEpattern.matcher(myLine).find()){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
-			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
-			LogTrace(msg, 20);
-			validated = false;
-		}
-		
-	}
-
+	
 	private void EXT_X_ENDLIST(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -186,6 +171,7 @@ public class MediaListExtTag extends ExtTagStream {
 		((MediaPlayList)containingList).endListFound = true;
 	}
 
+
 	private void EXT_X_TARGETDURATION(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -204,10 +190,15 @@ public class MediaListExtTag extends ExtTagStream {
 			LogTrace(msg, 20);
 			validated = false;
 		}
-
+		
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
 	}
 
-	private void EXT_X_START(PlayListScanner scanner) {
+	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -217,15 +208,19 @@ public class MediaListExtTag extends ExtTagStream {
 			validated = false;
 			return;
 		}
-		// check tag pattern, matches() tbd
-//		if (!Tokens.EXT_X_STARTpattern.matcher(myLine).matches()){
+//		// check tag pattern 
+//		if (!Tokens.EXT_X_MEDIA_SEQUENCEpattern.matcher(myLine).find()){
 //			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
 //			LogStreamError(msg);
 //			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
 //			LogTrace(msg, 20);
 //			validated = false;
 //		}
-
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
 	}
 
 	private void EXT_X_PLAYLIST_TYPE(PlayListScanner scanner) {
@@ -246,7 +241,211 @@ public class MediaListExtTag extends ExtTagStream {
 //			LogTrace(msg, 20);
 //			validated = false;
 //		}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}	
 		
+	private void EXT_X_DISCONTINUITY_SEQUENCE(PlayListScanner scanner) {
 
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_DISCONTINUITY_SEQUENCEpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}	
+		
+	private void EXT_X_DISCONTINUITY(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_DISCONTINUITYpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
 	}
+
+	private void EXT_X_I_FRAMES_ONLY(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_I_FRAMES_ONLYpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+	
+	private void EXT_X_BYTERANGE(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_BYTERANGEpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+
+	private void EXT_X_PROGRAM_DATE_TIME(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_PROGRAM_DATE_TIMEpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+
+	private void EXT_X_KEY(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_KEYpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+	
+	private void EXT_X_MAP(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_MAPpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+	
+	private void EXT_X_ALLOW_CACHE(PlayListScanner scanner) {
+
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() tbd
+//			if (!Tokens.EXT_X_ALLOW_CACHEpattern.matcher(myLine).find()){
+//				msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//				LogStreamError(msg);
+//				msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//				LogTrace(msg, 20);
+//				validated = false;
+//			}
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+	}
+	
 }
