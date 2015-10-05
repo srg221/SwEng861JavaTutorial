@@ -6,7 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 
@@ -20,7 +22,8 @@ public class ExtTag {
 	public String myTagName;
 	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
-	public Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
+	protected Number value = -1;  // sentinel value
+	public Set<Attr1> attrSet = new HashSet<Attr1>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
 												{ Tokens.EXT_X_INDEPENDENT_SEGMENTS, "EXT_X_INDEPENDENT_SEGMENTS" }, 

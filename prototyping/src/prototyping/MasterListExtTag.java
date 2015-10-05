@@ -13,7 +13,9 @@ public class MasterListExtTag extends ExtTagStream {
 	private static	Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { {Tokens.EXT_X_STREAM_INF, "EXT_X_STREAM_INF"}, 
 												{Tokens.EXT_X_MEDIA, "EXT_X_MEDIA"},
-											   };
+												{Tokens.EXT_X_I_FRAME_STREAM_INF, "EXT_X_I_FRAME_STREAM_INF"},
+												{Tokens.EXT_X_SESSION_DATA, "EXT_X_SESSION_DATA"},
+												};
 	
 //	MasterListExtTag(PlayList playList, PlayListScanner scanner, String tagName, String url) throws MalformedURLException{
 //		super(playList, scanner, tagName, url);
@@ -70,6 +72,7 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
+	@SuppressWarnings("rawtypes")
 	private void EXT_X_STREAM_INF(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -118,11 +121,25 @@ public class MasterListExtTag extends ExtTagStream {
 				return;
 			}
 		} 
+		// still validate, try to get attr
+//		attrSet.add(new Attr1<Attr.AvInteger>(Tokens.BANDWIDTH));
+//		attrSet.add(new Attr1<Attr.AvInteger>(Tokens.AVERAGE_BANDWIDTH));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.CODECS));
+//		attrSet.add(new Attr1<Attr.AvResolution>(Tokens.RESOLUTION));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.AUDIO));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.VIDEO));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.SUBTITLES));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.CLOSED_CAPTIONS));
+//		attrSet.add(new Attr1<Attr.AvString>(Tokens.PROGRAM_ID));  // removed in ver 6
 
+		Attr1.GetAttr(attrSet , this.myLine);
 		// if still validated check rest of the tag line (myLine)
-		if (validated){
-			// 
-		}
+//		if (validated){
+//			// populate attribute Set
+//			Attr<Attr.AvInteger> test = new Attr<>(Tokens.BANDWIDTH);
+//			attrSet.add(test);
+//			attrSet.add(new Attr<Attr.AvInteger>(Tokens.BANDWIDTH));
+//		}
 	}
 	
 	private void EXT_X_MEDIA(PlayListScanner scanner){
@@ -151,4 +168,56 @@ public class MasterListExtTag extends ExtTagStream {
 		
 	}
 	
+	private void EXT_X_I_FRAME_STREAM_INF(PlayListScanner scanner){
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (!containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() since attributes follow
+//		if (!Tokens.EXT_X_I_FRAME_STREAM_INFpattern.matcher(myLine).find()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+		
+	}
+	
+	
+	private void EXT_X_SESSION_DATA(PlayListScanner scanner){
+		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
+		LogTrace(msg, 40);
+		if (!containingList.IsMaster()){
+			// error for this is logged in validator since if we got here,
+			// It has to be a coding error, just need to mark false.
+			validated = false;
+			return;
+		}
+		// check tag pattern, find() since attributes follow
+//		if (!Tokens.EXT_X_SESSION_DATApattern.matcher(myLine).find()){
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
+		
+		// TODO msg
+		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+		LogStreamError(msg);
+		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+		LogTrace(msg, 20);
+		
+	}
 }
