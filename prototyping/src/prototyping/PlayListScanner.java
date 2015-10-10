@@ -9,6 +9,7 @@ public class PlayListScanner {
 	public int currLineNum;
 	public String currLine;
 	
+	@SuppressWarnings("resource")
 	PlayListScanner( InputStream inStream ) 
 	{
 		scanner = new Scanner(inStream).useDelimiter(Tokens.endLine);  //return followed by newline

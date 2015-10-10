@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 //import prototyping.PlayList.MSG;
@@ -23,14 +24,18 @@ public class ExtTag {
 	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
 	protected Number value = Tokens.Bad_Num;  // sentinel value
+	@SuppressWarnings("rawtypes")
 	public Set<Attr> attrSet = new HashSet<Attr>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
 												{ Tokens.EXT_X_INDEPENDENT_SEGMENTS, "EXT_X_INDEPENDENT_SEGMENTS" }, 
 												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" },
 												{ Tokens.EXT_X_START, "EXT_X_START" } };
-
-	ExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
+	
+	private static TokenReleaseValidator releaseValidator = new TokenReleaseValidator();
+	
+	
+	public ExtTag(PlayList playList, PlayListScanner scanner, String tagName) {
 		// parent reference
 		containingList = playList;
 		//playListScanner = scanner;
@@ -39,7 +44,9 @@ public class ExtTag {
 		containingListName = containingList.myURL;
 		myTagName = tagName;
 	}
-
+	
+	// default disallowed except for some chicanary right here in the base
+	private ExtTag(){};
 	
 	// anyone can mark bad
 	public void MarkBad() { validated = false; }
@@ -48,6 +55,7 @@ public class ExtTag {
 	public String toString() {
 		return myTagName;
 	}
+	
 
 	public String Location() {
 //		if (myLineNumber == 0){
@@ -79,12 +87,6 @@ public class ExtTag {
 		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 
-	public static ExtTag Clone(PlayList playList, PlayListScanner scanner,
-			String tagName) {
-		ExtTag clone = new ExtTag(playList, scanner, tagName);
-		return clone;
-	}
-
 	public static boolean Initialize() {
 		// load my map validator.class.getMethod()
 		boolean status = true;
@@ -93,14 +95,12 @@ public class ExtTag {
 				validatorMap.put(validator[0],
 						ExtTag.class.getDeclaredMethod(validator[1], PlayListScanner.class));
 			} catch (NoSuchMethodException | SecurityException e) {
-				// curent logging not conducive to posting from static methods, this is a fatal coding error,
-				// will return bool to indicate success, and exit on failure
+				// current logging not conducive to posting from static methods, this is a fatal coding error,
+				// will return bool to indicate success, and exit on failure, 
 				e.printStackTrace();
 				status = false;
 			}
-		// validatorMap.put(validator[0],
-		// ExtTag.class.getMethod("EXTM3U",Class<ExtTag>,ExtTag.class));
-		// load leaf classes maps
+		// load leaf classes maps - error handling same as above
 		if (status)
 		 status = MasterListExtTag.Initialize();
 		if (status)
@@ -126,16 +126,31 @@ public class ExtTag {
 		return line.substring(beginIndex + 1).trim();
 	}
 	
-	public Number FindTagValue(int dummy){
-
-
-		return 0;
+	// use different signatures to indicate expected value
+	public Number FindTagValue(int dummy) throws TokenNotFoundException{
+		String tag = GetCandidateTag(myLine);
+		// go past tag
+		String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
+		String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.integerRegExp+"),";
+		Pattern valPat = Pattern.compile(valRegExp);
+		Matcher valMatch = valPat.matcher(left);
+		// need to find ":intValue," and only once
+		if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
+			throw new TokenNotFoundException("Integer Tag value not found");
+		return (Number)Tokens.GetNextInt(left);
 	}
 
-	public Number FindTagValue(float dummy){
-
-
-		return 0;
+	public Number FindTagValue(float dummy) throws TokenNotFoundException{
+		String tag = GetCandidateTag(myLine);
+		// go past tag
+		String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
+		String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.floatRegExp+"),";
+		Pattern valPat = Pattern.compile(valRegExp);
+		Matcher valMatch = valPat.matcher(left);
+		// need to find ":intValue," and only once
+		if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
+			throw new TokenNotFoundException("Integer Tag value not found");
+		return (Number)Tokens.GetNextFloat(left);
 	}
 	
 	public static boolean HasValidator(String tagName) {
@@ -152,7 +167,7 @@ public class ExtTag {
 				validatorMap.get(tagName).invoke(this, scanner);
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
-				// curent logging not conducive to posting from static methods, this is a fatal coding error,
+				// current logging not conducive to posting from static methods, this is a fatal coding error,
 				// will return bool to indicate successful call - not necessarily a valid tag
 				e.printStackTrace();
 				status = false;
@@ -160,7 +175,56 @@ public class ExtTag {
 		return status;
 	}
 	
-	// private static void EXTM3U(ExtTag This)
+	// start of valid release lookup code
+	public class ValidRelease {
+		public String token;
+		public int first = 1;
+		public int last = -1;
+		
+		public ValidRelease(String token, int first, int last) {
+			this.token = new String(token);
+			this.first = first; this.last = last;
+		}
+	}
+	public static class TokenReleaseValidator {
+		// this tag is for context only, so default ctor ok
+		private static ExtTag t = new ExtTag();
+		private static Map<String, ValidRelease> releaseMap = new HashMap<String, ValidRelease>();
+		// Only updated for tags valid for specific releases, 
+		// format is (token, first supported release, last supported release), where last=-1 => not deprecated yet
+		private static ValidRelease[] tokenList = {  t.new ValidRelease(Tokens.IV, 2, -1),
+													 t.new ValidRelease(Tokens.EXT_X_BYTERANGE, 4, -1),
+													 t.new ValidRelease(Tokens.EXT_X_I_FRAMES_ONLY, 4, -1),
+													 t.new ValidRelease(Tokens.EXT_X_MAP, 5, -1),
+													 t.new ValidRelease(Tokens.KEYFORMAT, 5, -1),
+													 t.new ValidRelease(Tokens.KEYFORMATVERSIONS, 5, -1),
+													 t.new ValidRelease(Tokens.PROGRAM_ID, 1, 6)
+												  };
+		private TokenReleaseValidator(){
+			for (ValidRelease v : tokenList)
+				releaseMap.put(v.token, v);
+		}
+		
+		public static boolean IsValid(String token, int release, ExtTag myTag){
+			// not being in map implies still valid for all releases
+			if (!releaseMap.containsKey(token))
+				return true;
+			
+			ValidRelease vr = releaseMap.get(token);
+			if (release < vr.first || release > vr.last)
+				return true;
+			else{
+				MSG msg = myTag.new MSG(GetTimeStamp(), myTag.Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), token+" is invalid for HLS ver:"+release);
+				myTag.LogStreamError(msg);
+				msg = myTag.new MSG(GetTimeStamp(), myTag.Location(), Context() , token+" is not valid fpr HLS version:"+release);
+				myTag.LogTrace(msg, 20);
+				return false;
+			}
+		}
+	}
+	
+
+	// Individual tag validators start
 	private void EXTM3U(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -203,16 +267,10 @@ public class ExtTag {
 			validated = false;
 			return;
 		}
-		// get version
-		// advance past tag
-		String remaining = myLine.substring(myLine.indexOf(Tokens.tagEnd)+1);
-		int v;
+		// get version (tag value)
+		int v = 0;
 		try {
-			v = Tokens.GetNextInt(remaining);
-			if (v>0){
-				containingList.version = v;
-				return;
-			}
+			containingList.version = (int) FindTagValue(v);
 		} catch (TokenNotFoundException e) {
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Specified version is not an integer");
 			LogStreamError(msg);
@@ -220,6 +278,22 @@ public class ExtTag {
 			LogTrace(msg, 20);
 			validated = false;
 		}
+//		// advance past tag
+//		String remaining = myLine.substring(myLine.indexOf(Tokens.tagEnd)+1);
+//		int v;
+//		try {
+//			v = Tokens.GetNextInt(remaining);
+//			if (v>0){
+//				containingList.version = v;
+//				return;
+//			}
+//		} catch (TokenNotFoundException e) {
+//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Specified version is not an integer");
+//			LogStreamError(msg);
+//			msg = new MSG(GetTimeStamp(), Location(), Context() , "version not an int. Exception:" + e.getMessage()+":"+e.getCause());
+//			LogTrace(msg, 20);
+//			validated = false;
+//		}
 	}
 	
 	private void EXT_X_INDEPENDENT_SEGMENTS(PlayListScanner scanner) {

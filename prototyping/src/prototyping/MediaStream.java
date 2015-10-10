@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Date;
-
-//import prototyping.M3u8InputStream.MSG;
 
 
 public class MediaStream {
@@ -19,14 +15,13 @@ public class MediaStream {
 	private SimpleLogger streamLogger = null;
 	private SimpleLogger traceLogger = null;
 	public String rootDirectory = null;
-	//public Handler mErrorLogHandler = null;
 	
-	MediaStream(String rootUrl, String inRootDirectory) {
+	MediaStream(String rootUrl, String rootDirectory, int streamLogLevel, int traceLogLevel) {
 
-		rootDirectory = new String(inRootDirectory);
+		this.rootDirectory = new String(rootDirectory);
 		// temps - these ones are to build path for logs and 
 		// validate root URL and local file system access check
-		String localPath = inRootDirectory;
+		String localPath = rootDirectory;
 		URL tmpURL;
 		try {
 			tmpURL = new URL(rootUrl);
@@ -53,8 +48,8 @@ public class MediaStream {
 		CreateLoggers(rootFileName);
 		// using max paranoids unless someone sets lower, production code should at least 
 		// pass levels in constructor, provide api, or read from shared mem so can change on the fly
-		streamLogger.SetParanoidLevel(100);
-		traceLogger.SetParanoidLevel(100);
+		streamLogger.SetParanoidLevel(streamLogLevel);
+		traceLogger.SetParanoidLevel(traceLogLevel);
 		
 		// Stream log header & start informational message
 		MSG msg = new MSG("Error No.","Time", "Location", "Severity", "Type", "Details");
@@ -82,9 +77,19 @@ public class MediaStream {
 		rootPlaylist = new PlayList(rootUrl, this);	
 	}
 	
+	// constructor with log levels, but no local root path
+	MediaStream(String rootUrl, int streamLogLevel, int traceLogLevel) {
+		this(rootUrl,System.getProperty("user.home"), streamLogLevel, streamLogLevel);
+	}
+	
+	// constructor with no log levels
+	MediaStream(String rootUrl, String rootDirectory) {
+		this (rootUrl,  rootDirectory, 100, 100);
+	}
+	
 	// constructor with no local root path, use user home directory
 	MediaStream(String rootUrl) {
-		this(rootUrl,System.getProperty("user.home"));
+		this(rootUrl, System.getProperty("user.home"), 100,100);
 	}
 	
 
@@ -143,8 +148,7 @@ public class MediaStream {
 		}
 		// output to console since would need to find logs to see the log created messages
 		System.out.println("Stream error log created:\n" + streamLogPath);
-		System.out.println("Run trace log created:\n" + traceLogPath);
-		
+		System.out.println("Run trace log created:\n" + traceLogPath);	
 		// success if get this far
 	}
 	

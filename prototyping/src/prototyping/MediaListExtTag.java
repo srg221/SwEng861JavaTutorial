@@ -423,6 +423,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_ALLOW_CACHE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");

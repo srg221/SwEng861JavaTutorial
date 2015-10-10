@@ -72,7 +72,7 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
-	@SuppressWarnings("rawtypes")
+
 	private void EXT_X_STREAM_INF(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -126,14 +126,13 @@ public class MasterListExtTag extends ExtTagStream {
 		//attrSet.add(new Attr<IntAttr>(IntAttr.class,Tokens.BANDWIDTH, this));
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.BANDWIDTH, this));
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.AVERAGE_BANDWIDTH, this));
-		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.AVERAGE_BANDWIDTH, this));
 		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CODECS, this));
 		attrSet.add(new Attr<Attr.AvResolution>(Attr.AvResolution.class ,Tokens.RESOLUTION, this));
 		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.AUDIO, this));
 		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.VIDEO, this));
 		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.SUBTITLES, this));
 		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CLOSED_CAPTIONS, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.PROGRAM_ID, this));  // removed in ver 6
+		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.PROGRAM_ID, this));  // removed in ver 6
 
 		Attr.GetAttr(this);
 		// if still validated check rest of the tag line (myLine)

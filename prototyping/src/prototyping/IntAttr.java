@@ -1,5 +1,7 @@
 package prototyping;
 
+import java.lang.reflect.Type;
+
 
 public class IntAttr implements IAttr<IntAttr> {
 	public int value = 0;
@@ -28,6 +30,10 @@ public class IntAttr implements IAttr<IntAttr> {
 	
 	public void Set(String strValue, ExtTag tag){
 		
+	}
+	
+	public Type GetType(){
+		return IntAttr.class;
 	}
 
 }

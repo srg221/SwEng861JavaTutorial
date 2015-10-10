@@ -19,7 +19,8 @@ public class Tokens {
     public static final String integerRegExp = "\\d+";
     public static final String floatRegExp = "\\d+\\.?\\d*";
     public static final String hexRegExp = "^0[x|X]([0-9A-F]+)";
-    public static final String quotedStrRegExp = "[^\"][^\n\"\r]+\"";  // needs work - match anything but LF, ", or CR
+    public static final String quotedStrRegExp = "[\"][^\n\"\r]+\"";  // needs work - match anything but LF, ", or CR
+    public static final String quotedLineRegExp = "[^\"][^\n\"\r]+\"";  // needs work - match anything but LF, ", or CR
     public static final String resolutionRegExp = "^("+integerRegExp+")x("+integerRegExp+")";
     public static final String beginLineExp = "^#";
     // Common and Attribute Value patterns 
@@ -65,15 +66,15 @@ public class Tokens {
 	public static final String FORCED = "FORCED";  //EXT_X_MEDIA attr
 	public static final String IN_STREAM_ID = "INSTREAM-ID"; //EXT_X_MEDIA attr
 	public static final String CHARACTERISTICS = "CHARACTERISTICS";  //EXT_X_MEDIA attr
-	public static final String BANDWIDTH = "BANDWIDTH"; //EXT_X_STREAM_INF attr
-	public static final String AVERAGE_BANDWIDTH = "AVERAGE-BANDWIDTH"; //EXT_X_STREAM_INF attr
-	public static final String CODECS = "CODECS"; //EXT_X_STREAM_INF attr
-	public static final String RESOLUTION = "RESOLUTION";  //EXT_X_STREAM_INF attr
+	public static final String BANDWIDTH = "BANDWIDTH"; //int, EXT_X_STREAM_INF attr
+	public static final String AVERAGE_BANDWIDTH = "AVERAGE-BANDWIDTH"; //int, EXT_X_STREAM_INF attr
+	public static final String CODECS = "CODECS"; //qString, EXT_X_STREAM_INF attr
+	public static final String RESOLUTION = "RESOLUTION";  //int x int, EXT_X_STREAM_INF attr
 	public static final String AUDIO = "AUDIO"; //EXT_X_STREAM_INF attr
 	public static final String VIDEO = "VIDEO"; //EXT_X_STREAM_INF attr
 	public static final String SUBTITLES = "SUBTITLES"; //EXT_X_STREAM_INF attr
 	public static final String CLOSED_CAPTIONS = "CLOSED-CAPTIONS"; //EXT_X_STREAM_INF attr
-	public static final String PROGRAM_ID = "PROGRAM-ID"; //EXT_X_STREAM_INF attr, removed in ver >= 6
+	public static final String PROGRAM_ID = "PROGRAM-ID"; //int, EXT_X_STREAM_INF attr, removed in ver >= 6
 	public static final String URI = "URI";  //EXT-X-I-FRAME-STREAM-INF attr et al
 	public static final String DATA_ID = "DATA-ID"; // EXT-X-SESSION-DATA attr
 	public static final String VALUE = "VALUE";  // EXT-X-SESSION-DATA attr
@@ -100,8 +101,8 @@ public class Tokens {
     //  attributes & Other
     public static final String METHOD = "METHOD";
     public static final String IV = "IV";
-    public static final String KEY_FORMAT = "KEYFORMAT";
-    public static final String KEY_FORMAT_VERSIONS = "KEYFORMATVERSIONS";
+    public static final String KEYFORMAT = "KEYFORMAT";
+    public static final String KEYFORMATVERSIONS = "KEYFORMATVERSIONS";
     // Tag Match Patterns
     public static final Pattern EXTINFpattern = Pattern.compile(beginLineExp+EXTINF+tagEnd+"("+floatRegExp+")(?:,(.+)?)?$");
     public static final Pattern EXT_X_ENDLISTpattern = Pattern.compile(beginLineExp+EXT_X_ENDLIST+"$");

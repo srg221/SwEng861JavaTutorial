@@ -3,20 +3,26 @@ package prototyping;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 
 interface IAttr <U> {
 	public String GetRegExp();
 	public U Get();
 	public void Set(String strValue, ExtTag tag);
+	public Type GetType();
 	//public GetNew();
 }
 
 public class Attr<T extends IAttr> {
 	// Attribute name
 	String name;
+	// union emulator UGH!!!
 	public T valueContainer;
+	// tag kept here for logging
 	public ExtTag myTag;
 	// valueContainerType
 	//public final  Class<T> valueClassType; 
@@ -52,10 +58,35 @@ public class Attr<T extends IAttr> {
 	// given a list of attributes and a line, find the the values and remove those 
 	// that don't exist
 	public static void GetAttr(ExtTag tag){
-	
-		for (Attr a : tag.attrSet){
-			String t = a.name;
-			String v = a.valueContainer.GetRegExp();
+	    String line = new String(tag.myLine);
+		//for (Attr a : tag.attrSet){  can't use a for each loop and remove, need to use iterator
+	    Iterator<Attr> itr = tag.attrSet.iterator();
+	    while (itr.hasNext()){
+	    	Attr a = itr.next();
+			// verbose local vars for debug
+			String name = a.name;
+			String regExp = "^"+name+"="+"("+a.valueContainer.GetRegExp()+")";
+			Matcher attrMatcher = Pattern.compile(regExp).matcher(line);
+			//Matcher attrMatcher = Pattern.compile("BANDWIDTH").matcher(line);
+			if (attrMatcher.find()){
+				// keep in map and send string to value container to set values
+				a.valueContainer.Set(attrMatcher.group(1), tag);
+			}
+			else{
+				itr.remove();
+			}
+			
+			
+//			String tag = GetCandidateTag(myLine);
+//			// go past tag
+//			String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
+//			String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.integerRegExp+"),";
+//			Pattern valPat = Pattern.compile(valRegExp);
+//			Matcher valMatch = valPat.matcher(left);
+//			// need to find ":intValue," and only once
+//			if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
+//				throw new TokenNotFoundException("Integer Tag value not found");
+//			return (Number)Tokens.GetNextInt(left);
 		}
 	}
 	
@@ -82,6 +113,10 @@ public class Attr<T extends IAttr> {
 		
 		public void Set(String strValue, ExtTag tag){
 			
+		}
+		
+		public Type GetType(){
+			return AvResolution.class;
 		}
 		
 		//public  static AvResolution GetNew(){ return new AvResolution();}
@@ -116,6 +151,11 @@ public class Attr<T extends IAttr> {
 		public void Set(String strValue, ExtTag tag){
 			
 		}
+		
+		public Type GetType(){
+			return AvHex.class;
+		}
+		
 	}
 	
 	//public class AvFloat extends IAttrVal<AvFloat>{
@@ -144,6 +184,10 @@ public class Attr<T extends IAttr> {
 		public void Set(String strValue, ExtTag tag){
 			
 		}
+		
+		public Type GetType(){
+			return AvFloat.class;
+		}
 	}
 	
 	//public class AvString extends IAttrVal<AvString>{
@@ -167,6 +211,10 @@ public class Attr<T extends IAttr> {
 		
 		public void Set(String strValue, ExtTag tag){
 			
+		}
+		
+		public Type GetType(){
+			return AvString.class;
 		}
 	}
 	// valid attr types
@@ -232,15 +280,18 @@ public class Attr<T extends IAttr> {
 		public void Set(String strValue, ExtTag tag){
 			
 		}
+		
+		public Type GetType(){
+			return AvInt.class;
+		}
 
 	}
 	
-	
-	
-	
-	
-	
-	
+	// logging utils at ExtTag level
+	// More logging stuff/utilities
+
+	// some wrappers to make code reading easier, would be simpler
+	// if java let you overload operators	
 	public String Location() {
 		if (myTag != null)
 			return (myTag.Location());
@@ -265,11 +316,7 @@ public class Attr<T extends IAttr> {
 		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 
-	// logging utils at ExtTag level
-	// More logging stuff/utilities
 
-	// some wrappers to make code reading easier, would be simpler
-	// if java let you overload operators
 	public class MSG {
 		private ArrayList<String> fields;
 
