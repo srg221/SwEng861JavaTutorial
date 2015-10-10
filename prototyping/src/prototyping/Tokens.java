@@ -118,7 +118,13 @@ public class Tokens {
 	// PROGRAM-ID attr removed from EXT-X-STREAM-INF & EXT-X-IFRAME-STREAM-INF after ver 6
 	// ver>=7  needed for SERVICE values of INSTREAM-ID attr of EXT-X-MEDIA 
 	
-    
+    // implementation details
+	// bad/sentinel values - typically mean not set, using the fact that everything 
+	// valid in this domain is non-negative
+	public static final int Bad_Int = -1;
+	public static final double Bad_Dbl = -1.0;
+	public static final Number Bad_Num = Bad_Int;
+	
     // Get token methods - algos copied from a number of sources
     public static int GetNextInt(String line) throws TokenNotFoundException {
         Matcher matcher = integerPattern.matcher(line);

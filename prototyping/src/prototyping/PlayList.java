@@ -17,7 +17,7 @@ public class PlayList {
 	protected ArrayList<ExtTag> inValidExtTags = new ArrayList<ExtTag>();
 	protected int lineNum = 0; 	// containing list line number, remains zero if
 								// top level
-	public int version = -1; 	// sentinel value to indicate never set, equiv to ver 1 
+	public int version = Tokens.Bad_Int; 	// sentinel value to indicate never set, equiv to ver 1 
 								// in any compatiblity check (use abs value)
 
 	protected PlayList() {

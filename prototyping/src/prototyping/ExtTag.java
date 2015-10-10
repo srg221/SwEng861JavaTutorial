@@ -22,8 +22,8 @@ public class ExtTag {
 	public String myTagName;
 	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
-	protected Number value = -1;  // sentinel value
-	public Set<Attr1> attrSet = new HashSet<Attr1>();
+	protected Number value = Tokens.Bad_Num;  // sentinel value
+	public Set<Attr> attrSet = new HashSet<Attr>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
 	private static String[][] validatorList = { { Tokens.EXTM3U, "EXTM3U" },
 												{ Tokens.EXT_X_INDEPENDENT_SEGMENTS, "EXT_X_INDEPENDENT_SEGMENTS" }, 
@@ -125,7 +125,19 @@ public class ExtTag {
 		// tagBegin) line
 		return line.substring(beginIndex + 1).trim();
 	}
+	
+	public Number FindTagValue(int dummy){
 
+
+		return 0;
+	}
+
+	public Number FindTagValue(float dummy){
+
+
+		return 0;
+	}
+	
 	public static boolean HasValidator(String tagName) {
 		return (validatorMap.containsKey(tagName));
 	}

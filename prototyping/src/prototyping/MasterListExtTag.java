@@ -122,17 +122,20 @@ public class MasterListExtTag extends ExtTagStream {
 			}
 		} 
 		// still validate, try to get attr
-//		attrSet.add(new Attr1<Attr.AvInteger>(Tokens.BANDWIDTH));
-//		attrSet.add(new Attr1<Attr.AvInteger>(Tokens.AVERAGE_BANDWIDTH));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.CODECS));
-//		attrSet.add(new Attr1<Attr.AvResolution>(Tokens.RESOLUTION));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.AUDIO));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.VIDEO));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.SUBTITLES));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.CLOSED_CAPTIONS));
-//		attrSet.add(new Attr1<Attr.AvString>(Tokens.PROGRAM_ID));  // removed in ver 6
+		// test of external class
+		//attrSet.add(new Attr<IntAttr>(IntAttr.class,Tokens.BANDWIDTH, this));
+		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.BANDWIDTH, this));
+		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.AVERAGE_BANDWIDTH, this));
+		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.AVERAGE_BANDWIDTH, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CODECS, this));
+		attrSet.add(new Attr<Attr.AvResolution>(Attr.AvResolution.class ,Tokens.RESOLUTION, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.AUDIO, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.VIDEO, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.SUBTITLES, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CLOSED_CAPTIONS, this));
+		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.PROGRAM_ID, this));  // removed in ver 6
 
-		Attr1.GetAttr(attrSet , this.myLine);
+		Attr.GetAttr(this);
 		// if still validated check rest of the tag line (myLine)
 //		if (validated){
 //			// populate attribute Set
