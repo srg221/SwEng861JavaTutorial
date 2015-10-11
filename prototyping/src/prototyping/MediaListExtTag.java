@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import prototyping.ExtTag.MSG;
 
@@ -84,6 +86,7 @@ public class MediaListExtTag extends ExtTagStream {
 	}
 
 	// private static void EXTINF(ExtTag This)
+	@SuppressWarnings("unchecked")
 	private void EXTINF(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -175,7 +178,7 @@ public class MediaListExtTag extends ExtTagStream {
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ "should be a float");
 			LogTrace(msg, 20);
 		}
-		if (!floatOk || !intOk){
+		if (!floatOk && !intOk){
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Duration");
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Duration");
@@ -183,14 +186,30 @@ public class MediaListExtTag extends ExtTagStream {
 			validated = false;
 		}
 
-		if (validated && ((MediaPlayList)containingList).targetDuration.intValue() < value.intValue()){
+		if (validated && ((MediaPlayList)containingList).targetDuration.floatValue() < value.floatValue()){
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Duration "+value+" > TargetDuration "+ ((MediaPlayList)containingList).targetDuration);
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration "+value+" > TargetDuration "+ ((MediaPlayList)containingList).targetDuration);
 			LogTrace(msg, 20);
 			validated = false;
 		}
-
+		
+		// save <title> in pseudoAttr
+		// consider everything past first comma potential descriptor
+		int commaLoc = myLine.indexOf(',');
+		// since optional, only do if comma found
+		if (commaLoc > 0){
+			String desc = new String(myLine.substring(commaLoc+1 ,myLine.length()));
+			// pattern is overkill here since title is any string "expressed as raw UTF-8 text"
+			// but doing it to make sure it exists before creating Attr to hold it
+			Matcher matcher = Pattern.compile(Tokens.UnQuotededStrRegExp).matcher(desc);
+			if (matcher.find() ){
+				// debug...
+				String grp0 = matcher.group(0);
+				pseudoAttr = new Attr<Attr.AvString>(Attr.AvString.class, "TITLE", this);
+				((Attr.AvString)pseudoAttr.valueContainer).value = desc;
+			}
+		}
 	}
 	
 	private void EXT_X_ENDLIST(PlayListScanner scanner) {
@@ -263,7 +282,7 @@ public class MediaListExtTag extends ExtTagStream {
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration should be an int");
 			LogTrace(msg, 20);
 		}
-		if (!floatOk || !intOk){
+		if (!floatOk && !intOk){
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Duration");
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Duration");
@@ -324,7 +343,7 @@ public class MediaListExtTag extends ExtTagStream {
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Media Sequence Number should be an int");
 			LogTrace(msg, 20);
 		}
-		if (!floatOk || !intOk){
+		if (!floatOk && !intOk){
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Media Sequence Number");
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Media Sequence Number");

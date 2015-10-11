@@ -13,14 +13,15 @@ public class Tokens {
 	public static final String endLine = "\\r?\\n";
 	public static final String tagBegin = "#EXT"; // primarily to distinguish tag from comment
 	public static final String tagEnd = ":";
-    // Common RegExpressions, most copied from the internet or def of attr in RFC
+    // Common RegExpressions, some copied from the internet or def of attr in RFC
     public static final String urlRegExp = "^(?:https?|ftp)://[^\\s/$.?#]*\\.[^\\s]*$";
     public static final String urlRegExp2 = "\\b(https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]";
     public static final String integerRegExp = "\\d+";
-    public static final String floatRegExp = "\\d+\\.?\\d*";
+    public static final String floatRegExp = "\\d+\\.\\d+";
     public static final String hexRegExp = "^0[x|X]([0-9A-F]+)";
-    public static final String quotedStrRegExp = "[\"][^\n\"\r]+\"";  // needs work - match anything but LF, ", or CR
-    public static final String quotedLineRegExp = "[^\"][^\n\"\r]+\"";  // needs work - match anything but LF, ", or CR
+    public static final String quotedStrRegExp = "[\"][^\n\"\r]+\"";  // needs work - match anything but LF, dquotes, or CR
+    public static final String quotedLineRegExp = "[^\"][^\n\"\r]+\"";  // needs work - match anything but LF, dquotes, or CR
+    public static final String UnQuotededStrRegExp = "[^, \n\"\r]+";  // needs work - match anything but comma, space, LF, ", or CR
     public static final String resolutionRegExp = "^("+integerRegExp+")x("+integerRegExp+")";
     public static final String beginLineExp = "^#";
     // Common and Attribute Value patterns 

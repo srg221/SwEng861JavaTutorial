@@ -23,7 +23,11 @@ public class ExtTag {
 	public String myTagName;
 	//protected PlayListScanner playListScanner;  // big mistake, which scanner is in use depends on context/lifecycle
 	protected boolean validated = true; // assume success
-	protected Number value = Tokens.Bad_Num;  // sentinel value
+	// use of these members depends on tag, i.e. some have a value:
+	public Number value = Tokens.Bad_Num;  // sentinel value
+	// and some have "pseudo attributes" that are unnamed, such as EXTINF <title> or EXT-X-BYTERANGE @o
+	// tags that implement this cannot use IAttr::SetValue, value should be set via appropriate constructor 
+	public Attr<?> pseudoAttr = null;
 	@SuppressWarnings("rawtypes")
 	public Set<Attr> attrSet = new HashSet<Attr>();
 	private static Map<String, Method> validatorMap = new HashMap<String, Method>();
@@ -32,6 +36,7 @@ public class ExtTag {
 												{ Tokens.EXT_X_VERSION, "EXT_X_VERSION" },
 												{ Tokens.EXT_X_START, "EXT_X_START" } };
 	
+	// apparently declaration needed to instantiate class(?)
 	private static TokenReleaseValidator releaseValidator = new TokenReleaseValidator();
 	
 	
@@ -160,7 +165,6 @@ public class ExtTag {
 	// public static void Validate(ExtTag This, String tagName) throws
 	// Exception, IllegalArgumentException, InvocationTargetException{
 	public boolean Validate(String tagName, PlayListScanner scanner) {
-		// validatorMap.get(tagName).invoke(This);
 		boolean status = true;
 		if (HasValidator(tagName))
 			try {

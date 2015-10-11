@@ -89,8 +89,6 @@ public class Attr<T extends IAttr> {
 	
 	// ATTRIBUTE Types
 	
-	// special case
-	//public class AvResolution extends IAttrVal<AvResolution>{
 	public class AvResolution implements IAttr<AvResolution>{
 		public int width = 0;
 		public int height = 0;
@@ -135,12 +133,6 @@ public class Attr<T extends IAttr> {
 			return AvResolution.class;
 		}
 		
-		//public  static AvResolution GetNew(){ return new AvResolution();}
-		
-//		public static AvResolution cloneThis(){
-//			AvResolution temp = new AvResolution();
-//			return temp;
-//		}
 	}
 	
 	//public class AvHex extends IAttrVal<AvHex> {
@@ -244,7 +236,7 @@ public class Attr<T extends IAttr> {
 		}
 		
 		public String GetRegExp(){
-			return Tokens.quotedStrRegExp;
+			return Tokens.UnQuotededStrRegExp;
 		}
 		
 		public AvString Get(){ return this;}
@@ -259,6 +251,33 @@ public class Attr<T extends IAttr> {
 		}
 	}
 	
+	//public class AvString extends IAttrVal<AvString>{
+	public class AvQuotedString implements IAttr<AvQuotedString>{
+		public String value = null;
+		//public static final Pattern pattern = Pattern.compile(Tokens.quotedStrRegExp);
+		AvQuotedString(){
+			value = new String();
+		}
+
+		AvQuotedString(String i){
+			value = new String(i);
+		}
+		
+		public String GetRegExp(){
+			return Tokens.quotedStrRegExp;
+		}
+		
+		public AvQuotedString Get(){ return this;}
+		public AvQuotedString GetNew(){ return new AvQuotedString();}
+		
+		public void Set(String strValue, ExtTag tag){
+			value = new String(strValue.substring(strValue.indexOf('=')+1, strValue.length()));
+		}
+		
+		public Type GetType(){
+			return AvString.class;
+		}
+	}
 
 	public class AvInt implements IAttr<AvInt> {
 		public int value = 0;
