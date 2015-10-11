@@ -73,6 +73,7 @@ public class MasterListExtTag extends ExtTagStream {
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
 
+	@SuppressWarnings("rawtypes")
 	private void EXT_X_STREAM_INF(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -121,7 +122,7 @@ public class MasterListExtTag extends ExtTagStream {
 				return;
 			}
 		} 
-		// still validate, try to get attr
+		// still valid, try to get attr
 		// test of external class
 		//attrSet.add(new Attr<IntAttr>(IntAttr.class,Tokens.BANDWIDTH, this));
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.BANDWIDTH, this));
@@ -135,13 +136,9 @@ public class MasterListExtTag extends ExtTagStream {
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.PROGRAM_ID, this));  // removed in ver 6
 
 		Attr.GetAttr(this);
+		
 		// if still validated check rest of the tag line (myLine)
-//		if (validated){
-//			// populate attribute Set
-//			Attr<Attr.AvInteger> test = new Attr<>(Tokens.BANDWIDTH);
-//			attrSet.add(test);
-//			attrSet.add(new Attr<Attr.AvInteger>(Tokens.BANDWIDTH));
-//		}
+
 	}
 	
 	private void EXT_X_MEDIA(PlayListScanner scanner){

@@ -133,19 +133,21 @@ public class MediaPlayListValidator {
 			LogTrace(msg);			
 	}
 
-	// pick out streams, note they were already downloaded as part of tag validation
-	for (ExtTag tag : mediaPlayList.validTags){
-	if (tag.myTagName.equals(Tokens.EXTINF)){
-		if (tag.IsValid())
-			mediaPlayList.validMediaStreams.add((ExtTagStream) tag);
-		}
-	}
-	// validate .ts files, like est duration
-	ValidateStreams();
+		// 2nd pass to see if mandatory valid tags found
+		
+	    // pick out streams, note they were already downloaded as part of tag validation
+		for (ExtTag tag : mediaPlayList.validTags){
+			if (tag.myTagName.equals(Tokens.EXTINF)){
+				if (tag.IsValid())
+					mediaPlayList.validMediaStreams.add((ExtTagStream) tag);
+				}
+			}
+		// validate .ts files, like est duration
+		ValidateStreams();
 	}
 	
 	public void ValidateStreams(){
-		// go through mediaPlayList.validMediaStreams
+		// go through mediaPlayList.validMediaStreams, simple case - look for repeating files
 		
 	}
 	

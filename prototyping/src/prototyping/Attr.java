@@ -4,10 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+
+import prototyping.ExtTag.MSG;
 
 interface IAttr <U> {
 	public String GetRegExp();
@@ -59,34 +62,28 @@ public class Attr<T extends IAttr> {
 	// that don't exist
 	public static void GetAttr(ExtTag tag){
 	    String line = new String(tag.myLine);
-		//for (Attr a : tag.attrSet){  can't use a for each loop and remove, need to use iterator
+		//for (Attr a : tag.attrSet){  can't use a for each loop 
+	    //and remove an Attr from the set, need to use iterator
 	    Iterator<Attr> itr = tag.attrSet.iterator();
 	    while (itr.hasNext()){
 	    	Attr a = itr.next();
 			// verbose local vars for debug
 			String name = a.name;
-			String regExp = "^"+name+"="+"("+a.valueContainer.GetRegExp()+")";
+			String regExp = name+"="+"("+a.valueContainer.GetRegExp()+")";
 			Matcher attrMatcher = Pattern.compile(regExp).matcher(line);
 			//Matcher attrMatcher = Pattern.compile("BANDWIDTH").matcher(line);
 			if (attrMatcher.find()){
+				// debug...
+				String grp0 = attrMatcher.group(0);
+				//String grp1 = attrMatcher.group(1);
+				//String grp2 = attrMatcher.group(2);
 				// keep in map and send string to value container to set values
-				a.valueContainer.Set(attrMatcher.group(1), tag);
+				a.valueContainer.Set(attrMatcher.group(0), tag);
 			}
 			else{
 				itr.remove();
 			}
 			
-			
-//			String tag = GetCandidateTag(myLine);
-//			// go past tag
-//			String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
-//			String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.integerRegExp+"),";
-//			Pattern valPat = Pattern.compile(valRegExp);
-//			Matcher valMatch = valPat.matcher(left);
-//			// need to find ":intValue," and only once
-//			if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
-//				throw new TokenNotFoundException("Integer Tag value not found");
-//			return (Number)Tokens.GetNextInt(left);
 		}
 	}
 	
@@ -97,7 +94,6 @@ public class Attr<T extends IAttr> {
 	public class AvResolution implements IAttr<AvResolution>{
 		public int width = 0;
 		public int height = 0;
-		//public static final Pattern pattern = Pattern.compile(Tokens.resolutionRegExp);
 		
 		public AvResolution() {};
 		
@@ -112,7 +108,27 @@ public class Attr<T extends IAttr> {
 		public AvResolution Get(){ return this;}
 		
 		public void Set(String strValue, ExtTag tag){
+			try {
+				width = Tokens.GetNextInt(strValue);
+			} catch (TokenNotFoundException e) {
+				String attr = strValue.substring(0, strValue.indexOf('=')-1);
+				String val = strValue.substring(strValue.indexOf('=')+1, strValue.length());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "attr:"+attr+" bad val:"+val);
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context() , "attr:"+attr+" bad val:"+val);
+				LogTrace(msg, 20);
+			}
 			
+			try {
+				height = Tokens.GetNextInt(strValue.substring(strValue.indexOf('x')+1, strValue.length()));
+			} catch (TokenNotFoundException e) {
+				String attr = strValue.substring(0, strValue.indexOf('=')-1);
+				String val = strValue.substring(strValue.indexOf('=')+1, strValue.length());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "attr:"+attr+" bad val:"+val);
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context() , "attr:"+attr+" bad val:"+val);
+				LogTrace(msg, 20);
+			}
 		}
 		
 		public Type GetType(){
@@ -149,7 +165,22 @@ public class Attr<T extends IAttr> {
 		public AvHex GetNew(){ return new AvHex();}
 		
 		public void Set(String strValue, ExtTag tag){
-			
+			List<Byte> bytes;
+			try {
+				bytes = Tokens.GetNextHex(strValue);
+			} catch (TokenNotFoundException e) {
+				String attr = strValue.substring(0, strValue.indexOf('=')-1);
+				String val = strValue.substring(strValue.indexOf('=')+1, strValue.length());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "attr:"+attr+" bad val:"+val);
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context() , "attr:"+attr+" bad val:"+val);
+				LogTrace(msg, 20);
+				return;
+			}
+			value = 0;
+			for (byte b : bytes){
+				value += b;
+			}
 		}
 		
 		public Type GetType(){
@@ -182,12 +213,22 @@ public class Attr<T extends IAttr> {
 		public AvFloat GetNew(){ return new AvFloat();}
 		
 		public void Set(String strValue, ExtTag tag){
-			
+			try {
+				value = Tokens.GetNextFloat(strValue);
+			} catch (TokenNotFoundException e) {
+				String attr = strValue.substring(0, strValue.indexOf('=')-1);
+				String val = strValue.substring(strValue.indexOf('=')+1, strValue.length());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "attr:"+attr+" bad val:"+val);
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context() , "attr:"+attr+" bad val:"+val);
+				LogTrace(msg, 20);
+			}
 		}
 		
 		public Type GetType(){
 			return AvFloat.class;
 		}
+		
 	}
 	
 	//public class AvString extends IAttrVal<AvString>{
@@ -210,48 +251,15 @@ public class Attr<T extends IAttr> {
 		public AvString GetNew(){ return new AvString();}
 		
 		public void Set(String strValue, ExtTag tag){
-			
+			value = new String(strValue.substring(strValue.indexOf('=')+1, strValue.length()));
 		}
 		
 		public Type GetType(){
 			return AvString.class;
 		}
 	}
-	// valid attr types
 	
-	
-	/*
-	public class Program_Id{
-		public int id = 0;
-		
-		Program_Id(int inId){
-			id = inId;
-		}
-	}
-	
-	public class Bandwidth{
-		public int bandwidth = 0;
-		
-		Bandwidth(int inBandwidth){
-			bandwidth = inBandwidth;
-		}
-	}
-	
-	public class Duration{
-		// can be a float or int, internally keeping as float
-		public double duration = 0;
 
-		Duration(double inDuration){
-			duration = inDuration;
-		}
-		Duration(int inDuration){
-			duration = (double)inDuration;
-		}
-	}
-	*/
-
-	
-	//////////////////////////////////////////////
 	public class AvInt implements IAttr<AvInt> {
 		public int value = 0;
 		//public static final Pattern pattern = Pattern.compile(Tokens.integerRegExp);
@@ -278,7 +286,16 @@ public class Attr<T extends IAttr> {
 		public AvInt Get(){ return this;}
 		
 		public void Set(String strValue, ExtTag tag){
-			
+			try {
+				value = Tokens.GetNextInt(strValue);
+			} catch (TokenNotFoundException e) {
+				String attr = strValue.substring(0, strValue.indexOf('=')-1);
+				String val = strValue.substring(strValue.indexOf('=')+1, strValue.length());
+				MSG msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "attr:"+attr+" bad val:"+val);
+				LogStreamError(msg);
+				msg = new MSG(GetTimeStamp(), Location(), Context() , "attr:"+attr+" bad val:"+val);
+				LogTrace(msg, 20);
+			}
 		}
 		
 		public Type GetType(){

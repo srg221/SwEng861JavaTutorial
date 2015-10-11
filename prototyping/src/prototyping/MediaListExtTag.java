@@ -143,8 +143,52 @@ public class MediaListExtTag extends ExtTagStream {
 		} 
 
 		// if still validated check rest of the tag line (myLine), and .ts file characteristics
-		if (validated){
-			// 
+		// get segment duration (tag value)
+		boolean floatOk = false; boolean intOk = false;
+		// try float first
+		try {
+			float v = 0;
+			value = FindTagValue(v);
+			floatOk = true;
+		} catch (TokenNotFoundException e) {
+			floatOk = false;
+		}
+		
+		if (!floatOk) {
+			try {
+				int v = 0;
+				value = FindTagValue(v);
+				intOk = true;
+			} catch (TokenNotFoundException e) {
+				intOk = false;
+			}
+		}
+		if (Math.abs(containingList.version) < 3 && floatOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ "should be an int");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ "should be an int");
+			LogTrace(msg, 20);
+		}
+		if (Math.abs(containingList.version) >= 3 && intOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ "should be a float");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ "should be a float");
+			LogTrace(msg, 20);
+		}
+		if (!floatOk || !intOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Duration");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Duration");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+
+		if (validated && ((MediaPlayList)containingList).targetDuration.intValue() < value.intValue()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Duration "+value+" > TargetDuration "+ ((MediaPlayList)containingList).targetDuration);
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration "+value+" > TargetDuration "+ ((MediaPlayList)containingList).targetDuration);
+			LogTrace(msg, 20);
+			validated = false;
 		}
 
 	}
@@ -166,6 +210,7 @@ public class MediaListExtTag extends ExtTagStream {
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
 			LogTrace(msg, 20);
 			validated = false;
+			return;
 		}
 		// set playlist endlist found
 		((MediaPlayList)containingList).endListFound = true;
@@ -191,11 +236,48 @@ public class MediaListExtTag extends ExtTagStream {
 			validated = false;
 		}
 		
+		// if still validated check rest of the tag line (myLine), and .ts file characteristics
+		// get segment duration (tag value), should be an int
+		boolean floatOk = false; boolean intOk = false;
+		// try int first
+		try {
+			int v = 0;
+			((MediaPlayList)containingList).targetDuration = value = FindTagValue(v);
+			intOk = true;
+		} catch (TokenNotFoundException e) {
+			intOk = false;
+		}
+		
+		if (!intOk) {
+			try {
+				float v = 0;
+				((MediaPlayList)containingList).targetDuration = value = FindTagValue(v);
+				floatOk = true;
+			} catch (TokenNotFoundException e) {
+				floatOk = false;
+			}
+		}
+		if (floatOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration should be an int");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration should be an int");
+			LogTrace(msg, 20);
+		}
+		if (!floatOk || !intOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Duration");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Duration");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+
+		
+		
 		// TODO msg
-		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
-		LogStreamError(msg);
-		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
-		LogTrace(msg, 20);
+//		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+//		LogStreamError(msg);
+//		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+//		LogTrace(msg, 20);
 	}
 
 	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
@@ -208,19 +290,54 @@ public class MediaListExtTag extends ExtTagStream {
 			validated = false;
 			return;
 		}
-//		// check tag pattern 
-//		if (!Tokens.EXT_X_MEDIA_SEQUENCEpattern.matcher(myLine).find()){
-//			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
-//			LogStreamError(msg);
-//			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
-//			LogTrace(msg, 20);
-//			validated = false;
-//		}
+		// check tag pattern 
+		if (!Tokens.EXT_X_MEDIA_SEQUENCEpattern.matcher(myLine).find()){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad format");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad format");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+		// get media sequence, should be an int
+		boolean floatOk = false; boolean intOk = false;
+		// try int first
+		try {
+			int v = 0;
+			value = FindTagValue(v);
+			intOk = true;
+		} catch (TokenNotFoundException e) {
+			intOk = false;
+		}
+		
+		if (!intOk) {
+			try {
+				float v = 0;
+				value = FindTagValue(v);
+				floatOk = true;
+			} catch (TokenNotFoundException e) {
+				floatOk = false;
+			}
+		}
+		if (floatOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Media Sequence Number should be an int");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Media Sequence Number should be an int");
+			LogTrace(msg, 20);
+		}
+		if (!floatOk || !intOk){
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Bad Media Sequence Number");
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Bad Media Sequence Number");
+			LogTrace(msg, 20);
+			validated = false;
+		}
+
+		
 		// TODO msg
-		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
-		LogStreamError(msg);
-		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
-		LogTrace(msg, 20);
+//		msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Validator implementation not complete");
+//		LogStreamError(msg);
+//		msg = new MSG(GetTimeStamp(), Location(), Context() , "Validator implementation not complete");
+//		LogTrace(msg, 20);
 	}
 
 	private void EXT_X_PLAYLIST_TYPE(PlayListScanner scanner) {

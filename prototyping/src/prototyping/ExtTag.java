@@ -178,8 +178,8 @@ public class ExtTag {
 	// start of valid release lookup code
 	public class ValidRelease {
 		public String token;
-		public int first = 1;
-		public int last = -1;
+		public int first = 1; // implicit
+		public int last = Tokens.Bad_Int;  // if unset, i.e, not deprecated
 		
 		public ValidRelease(String token, int first, int last) {
 			this.token = new String(token);
@@ -191,13 +191,13 @@ public class ExtTag {
 		private static ExtTag t = new ExtTag();
 		private static Map<String, ValidRelease> releaseMap = new HashMap<String, ValidRelease>();
 		// Only updated for tags valid for specific releases, 
-		// format is (token, first supported release, last supported release), where last=-1 => not deprecated yet
-		private static ValidRelease[] tokenList = {  t.new ValidRelease(Tokens.IV, 2, -1),
-													 t.new ValidRelease(Tokens.EXT_X_BYTERANGE, 4, -1),
-													 t.new ValidRelease(Tokens.EXT_X_I_FRAMES_ONLY, 4, -1),
-													 t.new ValidRelease(Tokens.EXT_X_MAP, 5, -1),
-													 t.new ValidRelease(Tokens.KEYFORMAT, 5, -1),
-													 t.new ValidRelease(Tokens.KEYFORMATVERSIONS, 5, -1),
+		// format is (token, first supported release, last supported release), where last=Bad_Int => not deprecated yet
+		private static ValidRelease[] tokenList = {  t.new ValidRelease(Tokens.IV, 2, Tokens.Bad_Int),
+													 t.new ValidRelease(Tokens.EXT_X_BYTERANGE, 4, Tokens.Bad_Int),
+													 t.new ValidRelease(Tokens.EXT_X_I_FRAMES_ONLY, 4, Tokens.Bad_Int),
+													 t.new ValidRelease(Tokens.EXT_X_MAP, 5, Tokens.Bad_Int),
+													 t.new ValidRelease(Tokens.KEYFORMAT, 5, Tokens.Bad_Int),
+													 t.new ValidRelease(Tokens.KEYFORMATVERSIONS, 5, Tokens.Bad_Int),
 													 t.new ValidRelease(Tokens.PROGRAM_ID, 1, 6)
 												  };
 		private TokenReleaseValidator(){
@@ -211,7 +211,7 @@ public class ExtTag {
 				return true;
 			
 			ValidRelease vr = releaseMap.get(token);
-			if (release < vr.first || release > vr.last)
+			if (Math.abs(release) >= vr.first && (Math.abs(release) <= vr.last || vr.last == Tokens.Bad_Int))
 				return true;
 			else{
 				MSG msg = myTag.new MSG(GetTimeStamp(), myTag.Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), token+" is invalid for HLS ver:"+release);
@@ -259,7 +259,7 @@ public class ExtTag {
 			LogTrace(msg, 20);
 			validated = false;
 		}
-		if (containingList.version != -1){
+		if (containingList.version != Tokens.Bad_Int){
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.SEVERE.toString(), Err.Type.TAG.toString(), "Version previously set to "+Integer.toString(containingList.version));
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duplicate Version Tag");
@@ -270,7 +270,7 @@ public class ExtTag {
 		// get version (tag value)
 		int v = 0;
 		try {
-			containingList.version = (int) FindTagValue(v);
+			value = containingList.version = (int) FindTagValue(v);			
 		} catch (TokenNotFoundException e) {
 			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Specified version is not an integer");
 			LogStreamError(msg);

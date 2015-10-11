@@ -10,6 +10,8 @@ public class MediaPlayList extends PlayList {
 	public ArrayList<ExtTagStream> validMediaStreams = new ArrayList<ExtTagStream>();
 	
 	public boolean endListFound = false;
+	
+	public Number targetDuration = Tokens.Bad_Int;
 
 	public MediaPlayList(String url, MediaStream inMediaStream,
 			PlayList master, int inLineNo) {
