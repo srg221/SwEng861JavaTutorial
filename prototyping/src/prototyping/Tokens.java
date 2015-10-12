@@ -105,10 +105,12 @@ public class Tokens {
     public static final String KEYFORMAT = "KEYFORMAT";
     public static final String KEYFORMATVERSIONS = "KEYFORMATVERSIONS";
     // Tag Match Patterns
-    public static final Pattern EXTINFpattern = Pattern.compile(beginLineExp+EXTINF+tagEnd+"("+floatRegExp+")(?:,(.+)?)?$");
+    public static final Pattern EXTINFpattern = Pattern.compile(beginLineExp+EXTINF+tagEnd+"([("+floatRegExp+")|("+integerRegExp+")])");
     public static final Pattern EXT_X_ENDLISTpattern = Pattern.compile(beginLineExp+EXT_X_ENDLIST+"$");
     public static final Pattern EXT_X_MEDIA_SEQUENCEpattern = Pattern.compile(beginLineExp+EXT_X_MEDIA_SEQUENCE+tagEnd+"("+integerRegExp+")$");
-	public static final Pattern EXT_X_TARGETDURATIONpattern = Pattern.compile(beginLineExp+EXT_X_TARGETDURATION+tagEnd+ "("+integerRegExp+")$");
+	// target duration must be an int, but matching floats too so can continue and emit an error 
+    public static final Pattern EXT_X_TARGETDURATIONpattern = Pattern.compile(beginLineExp+EXT_X_TARGETDURATION+tagEnd+ "([("+floatRegExp+")|("+integerRegExp+")])");
+	//public static final Pattern EXT_X_TARGETDURATIONpattern = Pattern.compile(beginLineExp+EXT_X_TARGETDURATION+tagEnd+ "("+integerRegExp+")$");
     
 	
 	// version notes

@@ -2,7 +2,7 @@ package prototyping;
 
 import java.lang.reflect.Type;
 
-
+// !!!!This is just a class used to test the def of Attr types not def'd inside the Attr class !!!!
 public class IntAttr implements IAttr<IntAttr> {
 	public int value = 0;
 	//public static final Pattern pattern = Pattern.compile(Tokens.integerRegExp);

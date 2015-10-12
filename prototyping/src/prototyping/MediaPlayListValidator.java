@@ -142,13 +142,45 @@ public class MediaPlayListValidator {
 					mediaPlayList.validMediaStreams.add((ExtTagStream) tag);
 				}
 			}
-		// validate .ts files, like est duration
+		// check format errors (mostly tbd)
+		// check if mandatory valid tags exist
+		// tbd  - all but begin and end tag
+		if (!mediaPlayList.validTags.get(0).myTagName.contentEquals(Tokens.EXTM3U)){
+			msg = new MSG(GetTimeStamp(), mediaPlayList.Location(0) , Err.Sev.SEVERE.toString(), Err.Type.FORMAT.toString(), "Missing "+Tokens.EXTM3U);
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), mediaPlayList.Location(0), Context() , "Missing "+Tokens.EXTM3U);
+			LogTrace(msg);		
+		}
+		if (!mediaPlayList.validTags.get((mediaPlayList.validTags.size()-1)).myTagName.contentEquals(Tokens.EXT_X_ENDLIST)){
+			msg = new MSG(GetTimeStamp(), mediaPlayList.Location(listScanner.currLineNum) , Err.Sev.ERROR.toString(), Err.Type.FORMAT.toString(), "Missing "+Tokens.EXT_X_ENDLIST);
+			LogStreamError(msg);
+			msg = new MSG(GetTimeStamp(), mediaPlayList.Location(listScanner.currLineNum), Context() , "Missing "+Tokens.EXT_X_ENDLIST);
+			LogTrace(msg);		
+		}
+		
+		// validate .ts files, like est duration or repeated .ts
 		ValidateStreams();
 	}
 	
 	public void ValidateStreams(){
-		// go through mediaPlayList.validMediaStreams, simple case - look for repeating files
-		
+		// go through mediaPlayList.validMediaStreams, 
+		// simple case as an example - look for repeating files
+		// tbd, validate .ts files
+		ArrayList<ExtTagStream> validStreams = new ArrayList<ExtTagStream>(mediaPlayList.validMediaStreams);
+		for (ExtTagStream testTag : validStreams){
+			String testTagStrUrl = testTag.inStream.myStrUrl;
+			int testTagLN = testTag.myLineNumber;
+			for (ExtTagStream tag : mediaPlayList.validMediaStreams){
+				if (tag.inStream.myStrUrl.contentEquals(testTagStrUrl) &&
+						tag.myLineNumber > testTagLN) {
+					MSG msg = new MSG(GetTimeStamp(), tag.Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Url Line "+(tag.myLineNumber+1)+" is duplicate of "+(testTagLN+1) );
+					LogStreamError(msg);
+					msg = new MSG(GetTimeStamp(), tag.Location(), Context() , "Duplicate Version Tag");
+					LogTrace(msg, 20);
+				}
+			}
+			
+		}
 	}
 	
 	// logging helpers

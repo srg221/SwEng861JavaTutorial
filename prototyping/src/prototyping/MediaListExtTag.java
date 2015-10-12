@@ -82,6 +82,7 @@ public class MediaListExtTag extends ExtTagStream {
 				e.printStackTrace();
 				status = false;
 			}
+		IsValidforRelease(tagName, containingList.version, this);
 		return status;
 	}
 
@@ -167,15 +168,15 @@ public class MediaListExtTag extends ExtTagStream {
 			}
 		}
 		if (Math.abs(containingList.version) < 3 && floatOk){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ "should be an int");
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ " should be an int");
 			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ "should be an int");
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ " should be an int");
 			LogTrace(msg, 20);
 		}
 		if (Math.abs(containingList.version) >= 3 && intOk){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ "should be a float");
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration for ver "+containingList.version+ " should be a float");
 			LogStreamError(msg);
-			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ "should be a float");
+			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration for ver "+containingList.version+ " should be a float");
 			LogTrace(msg, 20);
 		}
 		if (!floatOk && !intOk){
@@ -277,7 +278,7 @@ public class MediaListExtTag extends ExtTagStream {
 			}
 		}
 		if (floatOk){
-			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.WARN.toString(), Err.Type.TAG.toString(), "Duration should be an int");
+			msg = new MSG(GetTimeStamp(), Location(), Err.Sev.ERROR.toString(), Err.Type.TAG.toString(), "Duration should be an int");
 			LogStreamError(msg);
 			msg = new MSG(GetTimeStamp(), Location(), Context() , "Duration should be an int");
 			LogTrace(msg, 20);

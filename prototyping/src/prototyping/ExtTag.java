@@ -136,11 +136,12 @@ public class ExtTag {
 		String tag = GetCandidateTag(myLine);
 		// go past tag
 		String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
-		String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.integerRegExp+"),";
+		String valRegExp = Tokens.tagEnd+"("+Tokens.integerRegExp+"(?![\\.]))";
 		Pattern valPat = Pattern.compile(valRegExp);
 		Matcher valMatch = valPat.matcher(left);
 		// need to find ":intValue," and only once
-		if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
+		//if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
+		if (!valMatch.find())
 			throw new TokenNotFoundException("Integer Tag value not found");
 		return (Number)Tokens.GetNextInt(left);
 	}
@@ -149,12 +150,12 @@ public class ExtTag {
 		String tag = GetCandidateTag(myLine);
 		// go past tag
 		String left = new String(myLine.substring(myLine.lastIndexOf(tag)));
-		String valRegExp = "^"+Tokens.tagEnd+"("+Tokens.floatRegExp+"),";
+		String valRegExp = Tokens.tagEnd+"("+Tokens.floatRegExp+")";
 		Pattern valPat = Pattern.compile(valRegExp);
 		Matcher valMatch = valPat.matcher(left);
 		// need to find ":intValue," and only once
-		if (!valMatch.find() && !valMatch.matches() && valMatch.groupCount() != 1)
-			throw new TokenNotFoundException("Integer Tag value not found");
+		if (!valMatch.find())
+			throw new TokenNotFoundException("Float Tag value not found");
 		return (Number)Tokens.GetNextFloat(left);
 	}
 	
@@ -176,10 +177,11 @@ public class ExtTag {
 				e.printStackTrace();
 				status = false;
 			}
+		IsValidforRelease(tagName, containingList.version, this);
 		return status;
 	}
 	
-	// start of valid release lookup code
+	// start of valid release lookup implementation
 	public class ValidRelease {
 		public String token;
 		public int first = 1; // implicit
@@ -209,7 +211,7 @@ public class ExtTag {
 				releaseMap.put(v.token, v);
 		}
 		
-		public static boolean IsValid(String token, int release, ExtTag myTag){
+		public static boolean IsValidforRelease(String token, int release, ExtTag myTag){
 			// not being in map implies still valid for all releases
 			if (!releaseMap.containsKey(token))
 				return true;
@@ -227,6 +229,9 @@ public class ExtTag {
 		}
 	}
 	
+	public static boolean IsValidforRelease(String token, int release, ExtTag myTag){
+		return TokenReleaseValidator.IsValidforRelease(token, release, myTag);
+	}
 
 	// Individual tag validators start
 	private void EXTM3U(PlayListScanner scanner) {

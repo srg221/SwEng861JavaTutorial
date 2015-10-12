@@ -68,6 +68,7 @@ public class MasterListExtTag extends ExtTagStream {
 				e.printStackTrace();
 				status = false;
 			}
+		IsValidforRelease(tagName, containingList.version, this);
 		return status;
 	}
 	
@@ -122,22 +123,29 @@ public class MasterListExtTag extends ExtTagStream {
 				return;
 			}
 		} 
-		// still valid, try to get attr
-		// test of external class
-		//attrSet.add(new Attr<IntAttr>(IntAttr.class,Tokens.BANDWIDTH, this));
+
+		// still valid, try to get attr, load attr set 
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.BANDWIDTH, this));
 		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.AVERAGE_BANDWIDTH, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CODECS, this));
+		attrSet.add(new Attr<Attr.AvQuotedString>(Attr.AvQuotedString.class, Tokens.CODECS, this));
 		attrSet.add(new Attr<Attr.AvResolution>(Attr.AvResolution.class ,Tokens.RESOLUTION, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.AUDIO, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.VIDEO, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.SUBTITLES, this));
-		attrSet.add(new Attr<Attr.AvString>(Attr.AvString.class, Tokens.CLOSED_CAPTIONS, this));
-		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.PROGRAM_ID, this));  // removed in ver 6
-
+		attrSet.add(new Attr<Attr.AvQuotedString>(Attr.AvQuotedString.class, Tokens.AUDIO, this));
+		attrSet.add(new Attr<Attr.AvQuotedString>(Attr.AvQuotedString.class, Tokens.VIDEO, this));
+		attrSet.add(new Attr<Attr.AvQuotedString>(Attr.AvQuotedString.class, Tokens.SUBTITLES, this));
+		// tbd - special handling here since NONE changes type to AvString...
+		attrSet.add(new Attr<Attr.AvQuotedString>(Attr.AvQuotedString.class, Tokens.CLOSED_CAPTIONS, this));
+		// deprecated in ver > 5
+		attrSet.add(new Attr<Attr.AvInt>(Attr.AvInt.class, Tokens.PROGRAM_ID, this));
+		// test of external class
+		//attrSet.add(new Attr<IntAttr>(IntAttr.class,Tokens.BANDWIDTH, this));
+		// find the above in the Tag line, only tise valid will remain in set
 		Attr.GetAttr(this);
-		
-		// if still validated check rest of the tag line (myLine)
+		// check that they are supported in this ver
+		for ( Attr a : attrSet){
+			String name = a.name;
+			// the call logs invalid ver msg 
+			IsValidforRelease(name, containingList.version, this);
+		}
 
 	}
 	
