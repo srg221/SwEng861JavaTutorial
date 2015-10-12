@@ -4,9 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import prototyping.MasterPlayListValidator.MSG;
 
-//import prototyping.MasterPlayListValidator.MSG;
+
 
 public class MediaPlayListValidator {
 	private PlayListScanner listScanner;

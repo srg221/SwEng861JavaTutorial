@@ -37,6 +37,7 @@ public class ExtTag {
 												{ Tokens.EXT_X_START, "EXT_X_START" } };
 	
 	// apparently declaration needed to instantiate class(?)
+	@SuppressWarnings("unused")
 	private static TokenReleaseValidator releaseValidator = new TokenReleaseValidator();
 	
 	
@@ -234,6 +235,7 @@ public class ExtTag {
 	}
 
 	// Individual tag validators start
+	@SuppressWarnings("unused")
 	private void EXTM3U(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -256,6 +258,7 @@ public class ExtTag {
 	}
 
 	// private static void EXT_X_VERSION(ExtTag This)
+	@SuppressWarnings("unused")
 	private void EXT_X_VERSION(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -305,6 +308,7 @@ public class ExtTag {
 //		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_INDEPENDENT_SEGMENTS(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -323,6 +327,7 @@ public class ExtTag {
 		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_START(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");

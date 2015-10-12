@@ -4,9 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 
-import prototyping.ExtTag.MSG;
 
 public class MasterListExtTag extends ExtTagStream {
 
@@ -74,7 +72,7 @@ public class MasterListExtTag extends ExtTagStream {
 	
 	//private static void EXT_X_STREAM_INF(ExtTag This)
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unused" })
 	private void EXT_X_STREAM_INF(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -149,6 +147,7 @@ public class MasterListExtTag extends ExtTagStream {
 
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_MEDIA(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -175,6 +174,7 @@ public class MasterListExtTag extends ExtTagStream {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_I_FRAME_STREAM_INF(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -202,6 +202,7 @@ public class MasterListExtTag extends ExtTagStream {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_SESSION_DATA(PlayListScanner scanner){
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);

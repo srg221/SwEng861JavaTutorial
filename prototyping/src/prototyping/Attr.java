@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
-import prototyping.ExtTag.MSG;
-
 interface IAttr <U> {
 	public String GetRegExp();
 	public U Get();
@@ -20,6 +18,7 @@ interface IAttr <U> {
 	//public GetNew();
 }
 
+@SuppressWarnings("rawtypes")
 public class Attr<T extends IAttr> {
 	// Attribute name
 	String name;
@@ -60,6 +59,7 @@ public class Attr<T extends IAttr> {
 
 	// given a list of attributes and a line, find the the values and remove those 
 	// that don't exist
+	@SuppressWarnings({ "rawtypes", "unused" })
 	public static void GetAttr(ExtTag tag){
 	    String line = new String(tag.myLine);
 		//for (Attr a : tag.attrSet){  can't use a for each loop 

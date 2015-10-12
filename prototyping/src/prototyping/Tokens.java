@@ -130,9 +130,11 @@ public class Tokens {
 	public static final Number Bad_Num = Bad_Int;
 	
     // Get token methods - algos copied from a number of sources
-    public static int GetNextInt(String line) throws TokenNotFoundException {
+    @SuppressWarnings("unused")
+	public static int GetNextInt(String line) throws TokenNotFoundException {
         Matcher matcher = integerPattern.matcher(line);
         if (matcher.find()){   	
+        	// debug
         	String temp = matcher.group();
         	return Integer.parseInt(matcher.group());}
         else{

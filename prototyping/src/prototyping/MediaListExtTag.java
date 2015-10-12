@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import prototyping.ExtTag.MSG;
 
 //import prototyping.ExtTag.MSG;
 
@@ -87,7 +86,7 @@ public class MediaListExtTag extends ExtTagStream {
 	}
 
 	// private static void EXTINF(ExtTag This)
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 	private void EXTINF(PlayListScanner scanner) {
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
 		LogTrace(msg, 40);
@@ -213,6 +212,7 @@ public class MediaListExtTag extends ExtTagStream {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_ENDLIST(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -237,6 +237,7 @@ public class MediaListExtTag extends ExtTagStream {
 	}
 
 
+	@SuppressWarnings("unused")
 	private void EXT_X_TARGETDURATION(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -300,6 +301,7 @@ public class MediaListExtTag extends ExtTagStream {
 //		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_MEDIA_SEQUENCE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -360,6 +362,7 @@ public class MediaListExtTag extends ExtTagStream {
 //		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_PLAYLIST_TYPE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -385,6 +388,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}	
 		
+	@SuppressWarnings("unused")
 	private void EXT_X_DISCONTINUITY_SEQUENCE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -410,6 +414,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}	
 		
+	@SuppressWarnings("unused")
 	private void EXT_X_DISCONTINUITY(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -435,6 +440,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_I_FRAMES_ONLY(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -460,6 +466,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_BYTERANGE(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -485,6 +492,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_PROGRAM_DATE_TIME(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -510,6 +518,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 
+	@SuppressWarnings("unused")
 	private void EXT_X_KEY(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
@@ -535,6 +544,7 @@ public class MediaListExtTag extends ExtTagStream {
 		LogTrace(msg, 20);
 	}
 	
+	@SuppressWarnings("unused")
 	private void EXT_X_MAP(PlayListScanner scanner) {
 
 		MSG msg = new MSG(GetTimeStamp(), Location(), Context() , "Starting tag validation");
